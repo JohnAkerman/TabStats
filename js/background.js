@@ -9,6 +9,7 @@ TabStats.init = function() {
 	TabStats.checkFirstRun();
 
 	chrome.tabs.onCreated.addListener(TabStats.onNewTab);
+	TabStats.getCurrentCount();
 }
 
 
@@ -24,7 +25,9 @@ TabStats.onNewTab = function() {
 	} else
 		TabStats.dailyCount++;
 
-	chrome.browserAction.setBadgeText({text: TabStats.dailyCount + ''});
+	TabStats.currentCount++;
+
+	chrome.browserAction.setBadgeText({text: TabStats.currentCount + ''});
 	
 	TabStats.saveStats();
 }
@@ -44,7 +47,6 @@ TabStats.firstRun = function() {
     localStorage.setItem("totalCreated", 0);
     localStorage.setItem('dailyCount', 0);
     localStorage.setItem('dailyDate', new Date());
-
 }
 
 TabStats.saveStats = function() {
@@ -53,6 +55,16 @@ TabStats.saveStats = function() {
     localStorage.setItem('dailyDate', TabStats.dailyDate);
 }
 
+TabStats.getCurrentCount = function() {
+	TabStats.currentCount = 0;
+	chrome.windows.getAll(null, function (windows) {
+		for (i in windows) {
+			chrome.tabs.getAllInWindow(windows[i].id, function (t) {
+				TabStats.currentCount += t.length;
+			});
+		}
+	});
+}
 
 // Call init on load
 window.addEventListener("load", TabStats.init, false);
