@@ -3,7 +3,6 @@ TabStats = {};
 TabStats.currentCount = 0;
 TabStats.totalCreated = 0;
 
-
 TabStats.init = function() {
 
 	TabStats.checkFirstRun();
@@ -11,7 +10,6 @@ TabStats.init = function() {
 	chrome.tabs.onCreated.addListener(TabStats.onNewTab);
 	TabStats.getCurrentCount();
 }
-
 
 TabStats.onNewTab = function() {
 	TabStats.currentCount++;
@@ -24,8 +22,6 @@ TabStats.onNewTab = function() {
 		TabStats.dailyDate = now;		
 	} else
 		TabStats.dailyCount++;
-
-	TabStats.currentCount++;
 
 	chrome.browserAction.setBadgeText({text: TabStats.currentCount + ''});
 	
