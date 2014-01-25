@@ -9,8 +9,7 @@ html {
 body {
 	min-width: 230px;
 	background: #E9E9E9;
-	background: url(/img/debut_light.png);
-	height: 250px;
+	background: url(/img/debutlight.png);
 	padding: 20px;
 }
 

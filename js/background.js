@@ -33,9 +33,9 @@ TabStats.dayChangeResetter = function() {
 
 TabStats.clearStats = function() {
 	localStorage.setItem("totalCreated", 0);
+	localStorage.setItem("totalDeleted", 0);
     localStorage.setItem('dailyCount', 0);
     localStorage.setItem('dailyDate', 0);
-    localStorage.setItem('currentCount', 0);
 }
 
 TabStats.onNewTab = function() {
@@ -71,6 +71,7 @@ TabStats.checkFirstRun = function() {
 		TabStats.firstRun();
 	}
 	TabStats.totalCreated = parseInt(localStorage.getItem("totalCreated"), 10);
+	TabStats.totalDeleted = parseInt(localStorage.getItem("totalDeleted"), 10);
 	TabStats.dailyCreatedCount = parseInt(localStorage.getItem("dailyCount"), 10);
     TabStats.dailyDate = new Date(localStorage.getItem('dailyDate'));
 }
@@ -78,23 +79,24 @@ TabStats.checkFirstRun = function() {
 TabStats.firstRun = function() {
     localStorage.setItem('firstRun', 'true');
     localStorage.setItem("totalCreated", 0);
+    localStorage.setItem("totalDeleted", 0);
     localStorage.setItem('dailyCount', 0);
     localStorage.setItem('dailyDate', new Date());
 }
 
 TabStats.loadStats = function() {
     if (localStorage.getItem("firstRun")) {
-        TabStats.currentCount = parseInt(localStorage.getItem("currentCount"), 10);
         TabStats.totalCreated = parseInt(localStorage.getItem("totalCreated"), 10);
+        TabStats.totalDeleted = parseInt(localStorage.getItem("totalDeleted"), 10);
         TabStats.dailyCount = parseInt(localStorage.getItem("dailyCount"), 10);
     }
 }
 
 TabStats.saveStats = function() {
     localStorage.setItem("totalCreated", TabStats.totalCreated);
+    localStorage.setItem("totalDeleted", TabStats.totalDeleted);
     localStorage.setItem('dailyCount', TabStats.dailyCreatedCount);
     localStorage.setItem('dailyDate', TabStats.dailyDate);
-    localStorage.setItem('currentCount', TabStats.currentCount);
 }
 
 TabStats.renderValue = function() {
@@ -114,11 +116,6 @@ TabStats.renderValue = function() {
 		    chrome.browserAction.setBadgeText({text: TabStats.totalDeleted + ''});
 		break;
 	}
-}
-
-TabStats.getCurrentCount = function() {
-	var tmp = 0;
-	
 }
 
 // Call init on load

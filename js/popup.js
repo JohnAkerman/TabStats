@@ -15,6 +15,7 @@ function init() {
 
     document.getElementById("showCurrent").addEventListener("click", showCurrent, false);
     document.getElementById("showCreated").addEventListener("click", showCreated, false);
+    document.getElementById("showDeleted").addEventListener("click", showDeleted, false);
 
     loadStats();
 }
@@ -23,6 +24,7 @@ function loadStats() {
     TabStats.loadStats();
     document.getElementById('currentCount').innerHTML = TabStats.currentCount;
     document.getElementById('totalCreated').innerHTML = TabStats.totalCreated;
+    document.getElementById('totalDeleted').innerHTML = TabStats.totalDeleted;
 
     
 }
@@ -46,5 +48,10 @@ function showCurrent() {
 
 function showCreated() {
     localStorage.setItem("showValue", 2);
+    TabStats.renderValue();
+}
+
+function showDeleted() {
+    localStorage.setItem("showValue", 3);
     TabStats.renderValue();
 }
