@@ -108,16 +108,22 @@ TabStats.renderValue = function() {
     if (shouldShow == "true") {
 		switch(TabStats.showValue) {
 
-			case 1:
+			// Current Count
+			case 1: 
 	   			chrome.browserAction.setBadgeText({text: TabStats.currentCount + ''});
+	   			chrome.browserAction.setBadgeBackgroundColor({color: "#5885E4"});
 			break;
 
+			// Total Created
 			case 2:
 	   			chrome.browserAction.setBadgeText({text: TabStats.totalCreated + ''});
+	   			chrome.browserAction.setBadgeBackgroundColor({color: "#4E9C4E"});
 			break;
 			
+			// Total Deleted
 			case 3:
 			    chrome.browserAction.setBadgeText({text: TabStats.totalDeleted + ''});
+	   			chrome.browserAction.setBadgeBackgroundColor({color: "#CF1E1E"});
 			break;
 		}
 	} else {
