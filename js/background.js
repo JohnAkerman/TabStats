@@ -3,6 +3,7 @@ TabStats = {};
 TabStats.currentCount = 0;
 TabStats.totalCreated = 0;
 TabStats.totalDeleted = 0;
+TabStats.showValue = 1;
 
 TabStats.dailyCreatedCount = 0;
 TabStats.dailyDeletedCount = 0;
@@ -13,7 +14,7 @@ TabStats.init = function() {
 
 	chrome.tabs.onCreated.addListener(TabStats.onNewTab);
 	chrome.tabs.onRemoved.addListener(TabStats.onCloseTab);
-	TabStats.currentCount = TabStats.getCurrentCount();
+    localStorage.setItem('showValue', TabStats.showValue);
     TabStats.renderValue();
 }
 
@@ -30,8 +31,16 @@ TabStats.dayChangeResetter = function() {
 	}
 }
 
+TabStats.clearStats = function() {
+	localStorage.setItem("totalCreated", 0);
+    localStorage.setItem('dailyCount', 0);
+    localStorage.setItem('dailyDate', 0);
+    localStorage.setItem('currentCount', 0);
+}
+
 TabStats.onNewTab = function() {
     console.log("newTab");
+    TabStats.currentCount++;
 	TabStats.totalCreated++;
 	
 	TabStats.dayChangeResetter();
@@ -43,10 +52,8 @@ TabStats.onNewTab = function() {
 	TabStats.saveStats();
 }
 
-
-
 TabStats.onCloseTab = function() {
-   TabStats.currentCount = TabStats.getCurrentCount();
+   TabStats.currentCount--;
    TabStats.totalDeleted++;
    
    TabStats.dayChangeResetter();
@@ -75,6 +82,14 @@ TabStats.firstRun = function() {
     localStorage.setItem('dailyDate', new Date());
 }
 
+TabStats.loadStats = function() {
+    if (localStorage.getItem("firstRun")) {
+        TabStats.currentCount = parseInt(localStorage.getItem("currentCount"), 10);
+        TabStats.totalCreated = parseInt(localStorage.getItem("totalCreated"), 10);
+        TabStats.dailyCount = parseInt(localStorage.getItem("dailyCount"), 10);
+    }
+}
+
 TabStats.saveStats = function() {
     localStorage.setItem("totalCreated", TabStats.totalCreated);
     localStorage.setItem('dailyCount', TabStats.dailyCreatedCount);
@@ -83,9 +98,9 @@ TabStats.saveStats = function() {
 }
 
 TabStats.renderValue = function() {
-	TabStats.selectedShow = parseInt(localStorage.getItem("showValue"), 10);
+	TabStats.showValue = parseInt(localStorage.getItem("showValue"), 10);
 
-	switch(TabStats.selectedShow) {
+	switch(TabStats.showValue) {
 
 		case 1:
    			chrome.browserAction.setBadgeText({text: TabStats.currentCount + ''});
@@ -103,15 +118,17 @@ TabStats.renderValue = function() {
 
 TabStats.getCurrentCount = function() {
 	var tmp = 0;
-	chrome.windows.getAll(null, function (windows) {
-		for (i in windows) {
-			chrome.tabs.getAllInWindow(windows[i].id, function (t) {
-				tmp += t.length;
-			});
-		}
-	});
-	return tmp;
+	
 }
 
 // Call init on load
 window.addEventListener("load", TabStats.init, false);
+
+chrome.windows.getAll({populate: true}, function (windows) {
+	for(var i = 0; i < windows.length; i++) {
+		console.log(windows[i].tabs.length);
+		TabStats.currentCount += windows[i].tabs.length;
+	}
+	console.log("Count: " + TabStats.currentCount);
+});
+
