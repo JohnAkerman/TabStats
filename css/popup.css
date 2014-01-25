@@ -2,10 +2,22 @@ html {
 	font-family: "Segoe UI", Arial, sans-serif;
 	color: #888;
 	font-size: 13px;
+	line-height: 19px;
 }
 body {
-	min-width: 300px;
+	min-width: 230px;
 	background: #E9E9E9;
 	height: 250px;
-	padding: 10px;
+	padding: 10px 20px;
+}
+
+h1 {
+	margin-top: 0;
+	text-align: center;
+}
+
+#reset{
+	cursor: pointer;
+	color: #e74c00;
+	font-weight: bold;
 }

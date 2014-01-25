@@ -9,20 +9,18 @@
         <div class="wrapper">
             <h1>Tab Stats</h1>
             <ul>
-                <li><strong id="currentCount">XXX</strong> Current Count</li>
-                <li><strong id="totalCreated">XXX</strong> Total Created</li>
+                <li><strong id="currentCount">0</strong> Current Count</li>
+                <li><strong id="totalCreated">0</strong> Total Created</li>
             </ul>
-            Total Today
 
             <div class="">
                 <label><input type="checkbox" id="showStat"/> Show stat on badge</label>
                 <br />
-                <input type="radio" id="showCurrent" name="showStat" value="1"> Current Count<br>
+                <input type="radio" id="showCurrent" name="showStat" value="1" selected> Current Count<br>
                 <input type="radio" id="showCreated" name="showStat" value="2"> Total Created<br>
                 <input type="radio" id="showDeleted" name="showStat" value="3"> Total Deleted<br>
             </div>
-            Show number in icon
-            Clear stats
+            <span id="reset">Clear stats</span>
             <p>Created by John and Matthew</p>
         </div>
     </body>
