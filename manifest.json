@@ -14,5 +14,12 @@
   },
   "background": {
     "scripts": ["/js/background.js"]
-  }
+  },
+  "icons": {
+      "128": "img/tabstats-128.png",
+      "16": "img/tabstats-16.png",
+      "19": "img/tabstats-19.png",
+      "32": "img/tabstats-32.png",
+      "48": "img/tabstats-48.png"
+   }
 }
