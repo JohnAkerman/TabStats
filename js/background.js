@@ -17,38 +17,43 @@ TabStats.init = function() {
 	TabStats.getCurrentCount();
 }
 
-TabStats.onNewTab = function() {
+TabStats.dayChangeResetter = function() {
 
-	TabStats.totalCreated++;
-	var now = new Date();
+    var now = new Date();
 
-	// Check if new tab in a new day
+    // Reset Daily counter on a new day
 	if (now.getDate() != TabStats.dailyDate.getDate()) {
-		TabStats.dailyCreatedCount = 1;
+		TabStats.dailyCreatedCount = 0;
+		TabStats.dailyDeletedCount = 0;
 		TabStats.dailyDate = now;		
-	} else
-		TabStats.dailyCreatedCount++;
+	}
+}
 
-	chrome.browserAction.setBadgeText({text: TabStats.dailyCreatedCount + ''});
+TabStats.onNewTab = function() {
+    console.log("newTab");
+	TabStats.totalCreated++;
+	
+	TabStats.dayChangeResetter();
+	
+	TabStats.dailyCreatedCount++;
+
+	chrome.browserAction.setBadgeText({text: '+' + TabStats.dailyCreatedCount + ''});
 	
 	TabStats.saveStats();
 }
+
+
 
 TabStats.onCloseTab = function() {
    console.log("closeTab");
    TabStats.currentCount--;
    TabStats.totalDeleted++;
-   var now = new Date();
    
-   //Check if close tab in a new day
-   if(now.getDate() != TabStats.dailyDate.getDate()) {
-      TabStats.dailyDeletedCount = 1;
-	  TabStats.dailyDate = now;
-   } else {
-      TabStats.dailyDeletedCount++;
-   }
+   TabStats.dayChangeResetter();
+
+   TabStats.dailyDeletedCount++;
    
-   chrome.browserAction.setBadgeText({text: TabStats.dailyDeletedCount + ''});
+   chrome.browserAction.setBadgeText({text: '-' + TabStats.dailyDeletedCount + ''});
    
    TabStats.saveStats();
 }
@@ -58,7 +63,7 @@ TabStats.checkFirstRun = function() {
 		TabStats.firstRun();
 	}
 	TabStats.totalCreated = parseInt(localStorage.getItem("totalCreated"), 10);
-	TabStats.dailyCount = parseInt(localStorage.getItem("dailyCount"), 10);
+	TabStats.dailyCreatedCount = parseInt(localStorage.getItem("dailyCount"), 10);
     TabStats.dailyDate = new Date(localStorage.getItem('dailyDate'));
 }
 
@@ -71,7 +76,7 @@ TabStats.firstRun = function() {
 
 TabStats.saveStats = function() {
     localStorage.setItem("totalCreated", TabStats.totalCreated);
-    localStorage.setItem('dailyCount', TabStats.dailyCount);
+    localStorage.setItem('dailyCount', TabStats.dailyCreatedCount);
     localStorage.setItem('dailyDate', TabStats.dailyDate);
 }
 
