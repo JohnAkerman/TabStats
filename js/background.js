@@ -82,6 +82,7 @@ TabStats.firstRun = function() {
     localStorage.setItem("totalDeleted", 0);
     localStorage.setItem('dailyCount', 0);
     localStorage.setItem('dailyDate', new Date());
+    localStorage.setItem("showStat", 'true');
 }
 
 TabStats.loadStats = function() {
@@ -102,19 +103,25 @@ TabStats.saveStats = function() {
 TabStats.renderValue = function() {
 	TabStats.showValue = parseInt(localStorage.getItem("showValue"), 10);
 
-	switch(TabStats.showValue) {
+    shouldShow = localStorage.getItem("showStat");
 
-		case 1:
-   			chrome.browserAction.setBadgeText({text: TabStats.currentCount + ''});
-		break;
+    if (shouldShow == "true") {
+		switch(TabStats.showValue) {
 
-		case 2:
-   			chrome.browserAction.setBadgeText({text: TabStats.totalCreated + ''});
-		break;
-		
-		case 3:
-		    chrome.browserAction.setBadgeText({text: TabStats.totalDeleted + ''});
-		break;
+			case 1:
+	   			chrome.browserAction.setBadgeText({text: TabStats.currentCount + ''});
+			break;
+
+			case 2:
+	   			chrome.browserAction.setBadgeText({text: TabStats.totalCreated + ''});
+			break;
+			
+			case 3:
+			    chrome.browserAction.setBadgeText({text: TabStats.totalDeleted + ''});
+			break;
+		}
+	} else {
+	    chrome.browserAction.setBadgeText({text: ''}); // Show empty string
 	}
 }
 

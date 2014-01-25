@@ -17,7 +17,13 @@ function init() {
     document.getElementById("showCreated").addEventListener("click", showCreated, false);
     document.getElementById("showDeleted").addEventListener("click", showDeleted, false);
 
+    document.getElementById("showStat").addEventListener("click", toggleShowStats, false);
+
+
     loadStats();
+
+    // Check if show is ticked
+    checkShowStats();
 }
 
 function loadStats() {
@@ -35,6 +41,21 @@ chrome.tabs.getAllInWindow(null, function(tabs) {
 });
 
 function toggleShowStats() {
+    if (document.getElementById("showStat").checked) {
+        localStorage.setItem("showStat", "true");
+    } else {
+        localStorage.setItem("showStat", "false");
+    }
+    TabStats.renderValue();
+}
+
+function checkShowStats() {
+    if (localStorage.getItem("showStat") == "true") {
+        document.getElementById("showStat").checked = true;
+        document.getElementById("showStat").checked = "checked"; 
+    } else {
+        document.getElementById("showStat").checked = false;
+    }
 }
 
 function clearStats() {
