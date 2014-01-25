@@ -12,13 +12,12 @@ TabStats.init = function() {
 	TabStats.checkFirstRun();
 
 	chrome.tabs.onCreated.addListener(TabStats.onNewTab);
-	
 	chrome.tabs.onRemoved.addListener(TabStats.onCloseTab);
-	TabStats.getCurrentCount();
+	TabStats.currentCount = TabStats.getCurrentCount();
 }
 
 TabStats.onNewTab = function() {
-
+   TabStats.currentCount++;
 	TabStats.totalCreated++;
 	var now = new Date();
 
@@ -29,13 +28,12 @@ TabStats.onNewTab = function() {
 	} else
 		TabStats.dailyCreatedCount++;
 
-	chrome.browserAction.setBadgeText({text: TabStats.dailyCreatedCount + ''});
+	chrome.browserAction.setBadgeText({text: TabStats.currentCount + ''});
 	
 	TabStats.saveStats();
 }
 
 TabStats.onCloseTab = function() {
-   console.log("closeTab");
    TabStats.currentCount--;
    TabStats.totalDeleted++;
    var now = new Date();
@@ -48,7 +46,7 @@ TabStats.onCloseTab = function() {
       TabStats.dailyDeletedCount++;
    }
    
-   chrome.browserAction.setBadgeText({text: TabStats.dailyDeletedCount + ''});
+   // chrome.browserAction.setBadgeText({text: TabStats.dailyDeletedCount + ''});
    
    TabStats.saveStats();
 }
