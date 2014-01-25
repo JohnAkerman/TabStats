@@ -126,9 +126,8 @@ window.addEventListener("load", TabStats.init, false);
 
 chrome.windows.getAll({populate: true}, function (windows) {
 	for(var i = 0; i < windows.length; i++) {
-		console.log(windows[i].tabs.length);
 		TabStats.currentCount += windows[i].tabs.length;
+   		TabStats.renderValue();
 	}
-	console.log("Count: " + TabStats.currentCount);
 });
 
