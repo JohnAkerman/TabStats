@@ -1,0 +1,11 @@
+html {
+	font-family: "Segoe UI", Arial, sans-serif;
+	color: #888;
+	font-size: 13px;
+}
+body {
+	min-width: 300px;
+	background: #E9E9E9;
+	height: 250px;
+	padding: 10px;
+}
