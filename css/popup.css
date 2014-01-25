@@ -36,6 +36,10 @@ h1 {
 	margin: 0;
 }
 
+#currentCount, #tabsForWindow { color: #5885E4;}
+#totalCreated { color: #4E9C4E;}
+#totalDeleted { color: #CF1E1E;}
+
 #badge-options {
 	border: 1px solid #D5D5D5;
 	padding: 10px;
