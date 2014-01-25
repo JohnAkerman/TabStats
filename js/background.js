@@ -78,6 +78,7 @@ TabStats.checkFirstRun = function() {
 
 TabStats.firstRun = function() {
     localStorage.setItem('firstRun', 'true');
+    localStorage.setItem('firstRunDate', new Date());
     localStorage.setItem("totalCreated", 0);
     localStorage.setItem("totalDeleted", 0);
     localStorage.setItem('dailyCount', 0);
