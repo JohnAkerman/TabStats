@@ -31,7 +31,7 @@ function loadStats() {
     document.getElementById('currentCount').innerHTML = TabStats.currentCount;
     document.getElementById('totalCreated').innerHTML = TabStats.totalCreated;
     document.getElementById('totalDeleted').innerHTML = TabStats.totalDeleted;
-
+	document.getElementById('longestTimeOnTab').innerHTML = TabStats.longestTimeOnTab/60000;
     
 }
 // Get current window tab count
