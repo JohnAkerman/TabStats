@@ -73,33 +73,30 @@ TabStats.onCloseTab = function() {
 }
 
 TabStats.onActiveTabChange = function(activeInfo) {
-console.log("activeTabChange");
-console.log(activeInfo);
-
+console.log("activeTabChange: " + activeInfo);
  
-  if(activeInfo.windowId == TabStats.windowIdOfActiveTab) {
-     if(TabStats.activeTabId != -1) {
-	    if(activeInfo.tabId != TabStats.activeTabId) {
-	       totalTimeOnActiveTab = Date.now() - TabStats.activeTabStartDateInMs; //milliseconds
-		   console.log(totalTimeOnActiveTab);
-		   if(totalTimeOnActiveTab > TabStats.longestTimeOnTab) {
-		      console.log("New Longest Time On Tab")
-		      TabStats.longestTimeOnTab = totalTimeOnActiveTab;
-			  TabStats.saveStats();
-		   }
+	if(activeInfo.windowId == TabStats.windowIdOfActiveTab) {
+		if(TabStats.activeTabId != -1) {
+			if(activeInfo.tabId != TabStats.activeTabId) {
+				totalTimeOnActiveTab = Date.now() - TabStats.activeTabStartDateInMs; //milliseconds
+				console.log("Total Time: " + totalTimeOnActiveTab);
+				if(totalTimeOnActiveTab > TabStats.longestTimeOnTab) {
+					console.log("New Longest Time On Tab: " + totalTimeOnActiveTab)
+					TabStats.longestTimeOnTab = totalTimeOnActiveTab;
+					TabStats.saveStats();
+				}
+			}
 		}
-	 }
-	 else {
-	    TabStats.activeTabStartDateInMs = Date.now(); //milliseconds
-	 }
-     TabStats.activeTabId = activeInfo.tabId;
-  }
-  else {
-     TabStats.windowIdOfActiveTab = activeInfo.windowId;
-	 TabStats.activeTabId = activeInfo.tabId;
-	 TabStats.activeTabStartDateInMs = Date.now(); //milliseconds
-  }
-  
+		else {
+			TabStats.activeTabStartDateInMs = Date.now(); //milliseconds
+		}
+		TabStats.activeTabId = activeInfo.tabId;
+	}
+	else {
+		TabStats.windowIdOfActiveTab = activeInfo.windowId;
+		TabStats.activeTabId = activeInfo.tabId;
+		TabStats.activeTabStartDateInMs = Date.now(); //milliseconds
+	}
 }
 
 TabStats.checkFirstRun = function() {

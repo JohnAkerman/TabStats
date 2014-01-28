@@ -35,12 +35,12 @@ h1 {
 	
 .stat-list li {
 	margin: 0;
-	padding-left: 30px;
+	padding-left: 10px;
 }
 
 .stat-list li strong {
 	text-align: right;
-	width: 40px;
+	width: 70px;
 	display: inline-block;
 	margin-right: 5px;
 }
