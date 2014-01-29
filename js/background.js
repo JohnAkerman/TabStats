@@ -10,8 +10,13 @@ TabStats.dailyDeletedCount = 0;
 
 //Note this is the active tab for the current window
 TabStats.activeTabId = -1;
+TabStats.activeTabTitle = "";
+TabStats.activeTabUrl = "";
 TabStats.windowIdOfActiveTab = -1;
+
 TabStats.longestTimeOnTab = 0; //milliseconds
+TabStats.longestTimeOnTabTitle = "";
+TabStats.longestTimeOnTabUrl = "";
 
 TabStats.init = function() {
 
@@ -42,6 +47,7 @@ TabStats.clearStats = function() {
 	localStorage.setItem("totalDeleted", 0);
     localStorage.setItem('dailyCount', 0);
     localStorage.setItem('dailyDate', 0);
+	localStorage.setItem('longestTimeOnTab', 0);
 }
 
 TabStats.onNewTab = function() {
@@ -70,11 +76,11 @@ TabStats.onCloseTab = function() {
    TabStats.renderValue();
    
    TabStats.saveStats();
-}
+} 
 
 TabStats.onActiveTabChange = function(activeInfo) {
 console.log("activeTabChange: " + activeInfo);
- 
+
 	if(activeInfo.windowId == TabStats.windowIdOfActiveTab) {
 		if(TabStats.activeTabId != -1) {
 			if(activeInfo.tabId != TabStats.activeTabId) {
@@ -83,7 +89,10 @@ console.log("activeTabChange: " + activeInfo);
 				if(totalTimeOnActiveTab > TabStats.longestTimeOnTab) {
 					console.log("New Longest Time On Tab: " + totalTimeOnActiveTab)
 					TabStats.longestTimeOnTab = totalTimeOnActiveTab;
+					TabStats.longestTimeOnTabTitle = TabStats.activeTabTitle;
+					TabStats.longestTimeOnTabUrl = TabStats.activeTabUrl;
 					TabStats.saveStats();
+					TabStats.activeTabStartDateInMs = Date.now(); //milliseconds
 				}
 			}
 		}
@@ -91,11 +100,19 @@ console.log("activeTabChange: " + activeInfo);
 			TabStats.activeTabStartDateInMs = Date.now(); //milliseconds
 		}
 		TabStats.activeTabId = activeInfo.tabId;
+		chrome.tabs.get(activeInfo.tabId, function (tab){
+		                                                 TabStats.activeTabTitle = tab.title;
+														 TabStats.activeTabUrl = tab.url;
+														});
 	}
 	else {
+	    TabStats.activeTabStartDateInMs = Date.now(); //milliseconds
 		TabStats.windowIdOfActiveTab = activeInfo.windowId;
 		TabStats.activeTabId = activeInfo.tabId;
-		TabStats.activeTabStartDateInMs = Date.now(); //milliseconds
+		chrome.tabs.get(activeInfo.tabId, function (tab){
+		                                                 TabStats.activeTabTitle = tab.title;
+														 TabStats.activeTabUrl = tab.url;
+														});
 	}
 }
 
@@ -116,6 +133,9 @@ TabStats.firstRun = function() {
     localStorage.setItem('dailyDate', new Date());
     localStorage.setItem("showStat", 'true');
 	localStorage.setItem('longestTimeOnTab', 0);
+	localStorage.setItem('longestTimeOnTabTitle', "");
+	localStorage.setItem('longestTimeOnTabUrl', "");
+	
 }
 
 TabStats.loadStats = function() {
@@ -124,6 +144,8 @@ TabStats.loadStats = function() {
         TabStats.totalDeleted = parseInt(localStorage.getItem("totalDeleted"), 10);
         TabStats.dailyCount = parseInt(localStorage.getItem("dailyCount"), 10);
 		TabStats.longestTimeOnTab = parseInt(localStorage.getItem("longestTimeOnTab"), 10);
+		TabStats.longestTimeOnTabTitle = localStorage.getItem("longestTimeOnTabTitle");
+		TabStats.longestTimeOnTabUrl = localStorage.getItem("longestTimeOnTabUrl");
     }
 }
 
@@ -133,6 +155,8 @@ TabStats.saveStats = function() {
     localStorage.setItem('dailyCount', TabStats.dailyCreatedCount);
     localStorage.setItem('dailyDate', TabStats.dailyDate);
 	localStorage.setItem('longestTimeOnTab', TabStats.longestTimeOnTab);
+	localStorage.setItem('longestTimeOnTabTitle', TabStats.longestTimeOnTabTitle);
+	localStorage.setItem('longestTimeOnTabUrl', TabStats.longestTimeOnTabUrl);
 }
 
 TabStats.renderValue = function() {
