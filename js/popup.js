@@ -19,11 +19,19 @@ function init() {
 
     document.getElementById("showStat").addEventListener("click", toggleShowStats, false);
 
+    // Reset stats
+    document.getElementById("deletedReset").addEventListener("click", deletedReset, false);
 
     loadStats();
 
     // Check if show is ticked
     checkShowStats();
+}
+
+function deletedReset() {
+    TabStats.totalDeleted = 0;
+    document.getElementById('totalDeleted').innerHTML = TabStats.totalDeleted;
+    TabStats.saveStats();
 }
 
 function loadStats() {

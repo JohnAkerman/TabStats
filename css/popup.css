@@ -38,6 +38,14 @@ h1 {
 	padding-left: 10px;
 }
 
+.stat-list li:hover > .resetBtn {
+	display: inline-block;
+}
+
+.stat-list li .resetBtn {
+	display: none;
+}
+
 .stat-list li strong {
 	text-align: right;
 	width: 70px;
@@ -79,3 +87,4 @@ a {
 a:hover {
 	text-decoration: underline;
 }
+
