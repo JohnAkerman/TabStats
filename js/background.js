@@ -159,6 +159,10 @@ TabStats.saveStats = function() {
 	localStorage.setItem('longestTimeOnTabUrl', TabStats.longestTimeOnTabUrl);
 }
 
+TabStats.thousandCheck = function(val) {
+    return (val > 1000 ? (val /1000).toFixed(1) + 'k' : val);
+}
+
 TabStats.renderValue = function() {
 	TabStats.showValue = parseInt(localStorage.getItem("showValue"), 10);
 
@@ -169,21 +173,21 @@ TabStats.renderValue = function() {
 
 			// Current Count
 			case 1: 
-	   			chrome.browserAction.setBadgeText({text: TabStats.currentCount + ''});
+	   			chrome.browserAction.setBadgeText({text: TabStats.thousandCheck(TabStats.currentCount) + ''});
 	   			chrome.browserAction.setBadgeBackgroundColor({color: "#5885E4"});
 	   			chrome.browserAction.setTitle({title: 'TabStats - ' + TabStats.currentCount + ' tabs currently open'});
 			break;
 
 			// Total Created
 			case 2:
-	   			chrome.browserAction.setBadgeText({text: TabStats.totalCreated + ''});
+	   			chrome.browserAction.setBadgeText({text: TabStats.thousandCheck(TabStats.totalCreated) + ''});
 	   			chrome.browserAction.setBadgeBackgroundColor({color: "#4E9C4E"});
 	   			chrome.browserAction.setTitle({title: 'TabStats - ' + TabStats.totalCreated + ' tabs created total'});
 			break;
 			
 			// Total Deleted
 			case 3:
-			    chrome.browserAction.setBadgeText({text: TabStats.totalDeleted + ''});
+			    chrome.browserAction.setBadgeText({text: TabStats.thousandCheck(TabStats.totalDeleted) + ''});
 	   			chrome.browserAction.setBadgeBackgroundColor({color: "#CF1E1E"});
 	   			chrome.browserAction.setTitle({title: 'TabStats - ' + TabStats.totalDeleted + ' tabs deleted total'});
 			break;
