@@ -35,7 +35,26 @@ h1 {
 	
 .stat-list li {
 	margin: 0;
-	padding-left: 10px;
+	padding-left: 5px;
+}
+
+.stat-list li:hover > .resetBtn {
+	display: inline-block;
+	border: 1px solid rgba(231, 76, 0, 0.62);
+	padding: 0px 2px;
+	line-height: 14px;
+	margin-left: 3px;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.stat-list li .resetBtn:hover {
+	text-decoration: none;
+	background: rgba(231, 76, 0, 0.19);
+}
+
+.stat-list li .resetBtn {
+	display: none;
 }
 
 .stat-list li strong {
@@ -79,3 +98,4 @@ a {
 a:hover {
 	text-decoration: underline;
 }
+
