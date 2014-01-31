@@ -47,6 +47,7 @@ function loadStats() {
     document.getElementById('totalCreated').innerHTML = TabStats.totalCreated;
     document.getElementById('totalDeleted').innerHTML = TabStats.totalDeleted;
 	document.getElementById('longestTimeOnTab').innerHTML =timeSince(TabStats.longestTimeOnTab/1000);
+    document.getElementById('longestTabName').setAttribute("title", TabStats.longestTimeOnTabTitle);
 }
 // Get current window tab count
 chrome.tabs.getAllInWindow(null, function(tabs) {
