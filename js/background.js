@@ -18,6 +18,8 @@ TabStats.longestTimeOnTab = 0; //milliseconds
 TabStats.longestTimeOnTabTitle = "";
 TabStats.longestTimeOnTabUrl = "";
 
+TabStats.duplicateCount = 0;
+
 TabStats.init = function() {
 	TabStats.checkFirstRun();
 
@@ -49,7 +51,6 @@ TabStats.clearStats = function() {
 }
 
 TabStats.onNewTab = function() {
-    console.log("newTab");
     TabStats.currentCount++;
 	TabStats.totalCreated++;
 	
@@ -63,7 +64,6 @@ TabStats.onNewTab = function() {
 }
 
 TabStats.onCloseTab = function() {
-   console.log("closeTab");
    TabStats.currentCount--;
    TabStats.totalDeleted++;
    
@@ -77,8 +77,6 @@ TabStats.onCloseTab = function() {
 } 
 
 TabStats.onActiveTabChange = function(activeInfo) {
-console.log("activeTabChange: " + activeInfo);
-
 	if(activeInfo.windowId == TabStats.windowIdOfActiveTab) {
 		if(TabStats.activeTabId != -1) {
 			if(activeInfo.tabId != TabStats.activeTabId) {
@@ -99,18 +97,18 @@ console.log("activeTabChange: " + activeInfo);
 		}
 		TabStats.activeTabId = activeInfo.tabId;
 		chrome.tabs.get(activeInfo.tabId, function (tab){
-		                                                 TabStats.activeTabTitle = tab.title;
-														 TabStats.activeTabUrl = tab.url;
-														});
+            TabStats.activeTabTitle = tab.title;
+            TabStats.activeTabUrl = tab.url;
+		});
 	}
 	else {
 	    TabStats.activeTabStartDateInMs = Date.now(); //milliseconds
 		TabStats.windowIdOfActiveTab = activeInfo.windowId;
 		TabStats.activeTabId = activeInfo.tabId;
 		chrome.tabs.get(activeInfo.tabId, function (tab){
-		                                                 TabStats.activeTabTitle = tab.title;
-														 TabStats.activeTabUrl = tab.url;
-														});
+            TabStats.activeTabTitle = tab.title;
+            TabStats.activeTabUrl = tab.url;
+        });
 	}
 }
 
@@ -133,7 +131,6 @@ TabStats.firstRun = function() {
 	localStorage.setItem('longestTimeOnTab', 0);
 	localStorage.setItem('longestTimeOnTabTitle', "");
 	localStorage.setItem('longestTimeOnTabUrl', "");
-	
 }
 
 TabStats.loadStats = function() {
@@ -198,10 +195,26 @@ TabStats.renderValue = function() {
 // Call init on load
 window.addEventListener("load", TabStats.init, false);
 
+tabArray = Array();
 chrome.windows.getAll({populate: true}, function (windows) {
-	for(var i = 0; i < windows.length; i++) {
-		TabStats.currentCount += windows[i].tabs.length;
-   		TabStats.renderValue();
-	}
+    for(var i = 0; i < windows.length; i++) {
+        TabStats.currentCount += windows[i].tabs.length;
+        TabStats.renderValue();
+        for(var j = 0; j < windows[i].tabs.length; j++) {
+            tabArray.push(windows[i].tabs[j].title);                
+        }
+    }
+    checkDupes(tabArray);
 });
 
+// Count up the dupes
+function checkDupes(tabArray) {
+    counter = {}
+    dupes = 0;
+    tabArray.forEach(function(obj) {
+        var key = JSON.stringify(obj)
+        counter[key] = (counter[key] || 0) + 1
+        dupes += (counter[key] - 1);
+    });
+    TabStats.duplicateCount = dupes;
+}
