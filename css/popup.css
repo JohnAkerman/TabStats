@@ -35,7 +35,7 @@ h1 {
 	
 .stat-list li {
 	margin: 0;
-	padding-left: 10px;
+	padding-left: 5px;
 }
 
 .stat-list li:hover > .resetBtn {
