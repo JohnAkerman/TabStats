@@ -42,6 +42,11 @@ h1 {
 	display: inline-block;
 }
 
+.stat-list li .resetBtn:hover {
+	font-weight: bold;
+	text-decoration: none;
+}
+
 .stat-list li .resetBtn {
 	display: none;
 }

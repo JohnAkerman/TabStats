@@ -21,6 +21,7 @@ function init() {
 
     // Reset stats
     document.getElementById("deletedReset").addEventListener("click", deletedReset, false);
+    document.getElementById("longestReset").addEventListener("click", longestReset, false);
 
     loadStats();
 
@@ -34,13 +35,18 @@ function deletedReset() {
     TabStats.saveStats();
 }
 
+function longestReset() {
+    TabStats.longestTimeOnTab = 0;
+    document.getElementById('longestTimeOnTab').innerHTML = TabStats.longestTimeOnTab;
+    TabStats.saveStats();  
+}
+
 function loadStats() {
     TabStats.loadStats();
     document.getElementById('currentCount').innerHTML = TabStats.currentCount;
     document.getElementById('totalCreated').innerHTML = TabStats.totalCreated;
     document.getElementById('totalDeleted').innerHTML = TabStats.totalDeleted;
 	document.getElementById('longestTimeOnTab').innerHTML =timeSince(TabStats.longestTimeOnTab/1000);
-    
 }
 // Get current window tab count
 chrome.tabs.getAllInWindow(null, function(tabs) {

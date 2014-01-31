@@ -14,7 +14,6 @@ TabStats.windowIdOfActiveTab = -1;
 TabStats.longestTimeOnTab = 0; //milliseconds
 
 TabStats.init = function() {
-
 	TabStats.checkFirstRun();
 
 	chrome.tabs.onCreated.addListener(TabStats.onNewTab);
@@ -23,7 +22,6 @@ TabStats.init = function() {
 	localStorage.setItem('showValue', TabStats.showValue);
     TabStats.renderValue();
 }
-
 
 TabStats.dayChangeResetter = function() {
 
