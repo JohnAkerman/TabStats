@@ -100,3 +100,6 @@ a:hover {
 	text-decoration: underline;
 }
 
+.duplicateHighlight {
+	color: #CF1E1E;
+}

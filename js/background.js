@@ -140,7 +140,7 @@ TabStats.loadStats = function() {
         TabStats.dailyCount = parseInt(localStorage.getItem("dailyCount"), 10);
 		TabStats.longestTimeOnTab = parseInt(localStorage.getItem("longestTimeOnTab"), 10);
 		TabStats.longestTimeOnTabTitle = localStorage.getItem("longestTimeOnTabTitle");
-		TabStats.longestTimeOnTabUrl = localStorage.getItem("longestTimeOnTabUrl");
+        TabStats.longestTimeOnTabUrl = localStorage.getItem("longestTimeOnTabUrl");
     }
 }
 
@@ -151,7 +151,7 @@ TabStats.saveStats = function() {
     localStorage.setItem('dailyDate', TabStats.dailyDate);
 	localStorage.setItem('longestTimeOnTab', TabStats.longestTimeOnTab);
 	localStorage.setItem('longestTimeOnTabTitle', TabStats.longestTimeOnTabTitle);
-	localStorage.setItem('longestTimeOnTabUrl', TabStats.longestTimeOnTabUrl);
+    localStorage.setItem('longestTimeOnTabUrl', TabStats.longestTimeOnTabUrl);
 }
 
 TabStats.thousandCheck = function(val) {
@@ -200,12 +200,21 @@ chrome.windows.getAll({populate: true}, function (windows) {
     for(var i = 0; i < windows.length; i++) {
         TabStats.currentCount += windows[i].tabs.length;
         TabStats.renderValue();
-        for(var j = 0; j < windows[i].tabs.length; j++) {
-            tabArray.push(windows[i].tabs[j].title);                
-        }
     }
-    checkDupes(tabArray);
 });
+
+TabStats.duplicateCheck = function(callback) {
+    tabArray = Array();
+    chrome.windows.getAll({populate: true}, function (windows) {
+        for(var i = 0; i < windows.length; i++) {
+            for(var j = 0; j < windows[i].tabs.length; j++) {
+                tabArray.push(windows[i].tabs[j].title);                
+            }
+        }
+        checkDupes(tabArray);
+        callback();
+    });
+}
 
 // Count up the dupes
 function checkDupes(tabArray) {
@@ -217,4 +226,5 @@ function checkDupes(tabArray) {
         dupes += (counter[key] - 1);
     });
     TabStats.duplicateCount = dupes;
+    TabStats.saveStats();
 }

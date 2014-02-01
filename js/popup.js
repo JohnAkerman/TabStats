@@ -8,8 +8,17 @@ window.addEventListener("load", init, false);
 
 // Per view load
 function init() {
-
+    
     TabStats = chrome.extension.getBackgroundPage().window.TabStats;
+
+    // Run the duplicate count check with the callback to display stat
+    TabStats.duplicateCheck(function() {
+        document.getElementById('duplicateCount').innerHTML = TabStats.duplicateCount;
+        if (TabStats.duplicateCount)
+            document.getElementById('duplicateCount').setAttribute("class", "duplicateHighlight");
+        else
+            document.getElementById('duplicateCount').removeAttribute("class");
+    });
 
     document.getElementById("showStat").addEventListener("click", toggleShowStats, false);
 
@@ -46,9 +55,10 @@ function loadStats() {
     document.getElementById('currentCount').innerHTML = TabStats.currentCount;
     document.getElementById('totalCreated').innerHTML = TabStats.totalCreated;
     document.getElementById('totalDeleted').innerHTML = TabStats.totalDeleted;
-	document.getElementById('longestTimeOnTab').innerHTML =timeSince(TabStats.longestTimeOnTab/1000);
+    document.getElementById('longestTimeOnTab').innerHTML =timeSince(TabStats.longestTimeOnTab/1000);
     document.getElementById('longestTabName').setAttribute("title", TabStats.longestTimeOnTabTitle);
 }
+
 // Get current window tab count
 chrome.tabs.getAllInWindow(null, function(tabs) {
     tabsForWindow = tabs.length;
