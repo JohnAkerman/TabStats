@@ -25,6 +25,7 @@ function init() {
     document.getElementById("showCurrent").addEventListener("click", showCurrent, false);
     document.getElementById("showCreated").addEventListener("click", showCreated, false);
     document.getElementById("showDeleted").addEventListener("click", showDeleted, false);
+    document.getElementById("exportStats").addEventListener("click", exportStats, false);
 
     // Reset stats
     document.getElementById("deletedReset").addEventListener("click", deletedReset, false);
@@ -103,6 +104,18 @@ function toggleShowStats() {
         localStorage.setItem("Settings.showStat", "false");
     }
     TabStats.renderValue();
+}
+
+function exportStats() {
+    var exp = JSON.stringify(TabStats.Stats);
+
+    var expStr = document.createElement("input");
+    expStr.setAttribute("value", exp);
+    expStr.setAttribute("id", "exportValue");
+
+    document.getElementById("stat-controls").appendChild(expStr);
+
+    document.getElementById("exportValue").select();
 }
 
 function checkShowStats() {

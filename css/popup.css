@@ -76,6 +76,7 @@ h1 {
 	background: rgba(223, 223, 223, 0.28);
 	width: 170px;
 	margin: 10px auto;
+	margin-bottom: 0;
 	border-radius: 3px;
 }
 
@@ -87,6 +88,26 @@ h1 {
 #badge-options label input {
 	position: relative;
 	top: 2px;
+}
+
+#stat-controls {
+	width: 197px;
+	margin: 10px auto;
+	font-size: 12px;
+}
+
+#exportValue {
+	background: rgba(223,223,223,0.28);
+	border: 1px solid #D5D5D5;
+	padding: 4px 0;
+	width: 100%;	
+	color: #888;
+	border-radius: 3px;
+	margin: 3px 0;
+}
+
+#clearAllStats { 
+	float: right;
 }
 
 #createdby { margin: 5px 0 -15px 0; font-size: 11px;}
