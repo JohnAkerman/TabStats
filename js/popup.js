@@ -30,10 +30,43 @@ function init() {
     document.getElementById("deletedReset").addEventListener("click", deletedReset, false);
     document.getElementById("longestReset").addEventListener("click", longestReset, false);
 
+    document.getElementById("clearAllStats").addEventListener("click", clearAllStats, false);
+
     loadStats();
 
     // Check if show is ticked
     checkShowStats();
+}
+
+function clearAllStats() {
+    TabStats.Stats = {
+    "activeTab": {
+        "id" : -1,
+        "windowId" : -1,
+        "url" : "",
+        "title" : "",
+        "StartDateInMs" :0
+    },
+    "longest" : {
+        "tab": {
+            "time" : 0,
+            "url" : "",
+            "title" : ""
+        }
+    },
+    "daily" : {
+        "created": 0,
+        "deleted": 0
+    },
+    "total" : {
+        "created": 0,
+        "deleted": 0
+    },
+    "duplicateCount" : 0,
+    "currentCount" : 0
+    };
+
+    loadStats();
 }
 
 function deletedReset() {
