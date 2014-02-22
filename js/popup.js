@@ -62,8 +62,8 @@ function clearAllStats() {
         "created": 0,
         "deleted": 0
     },
-    "duplicateCount" : 0,
-    "currentCount" : 0
+    "duplicateCount" : TabStats.Stats.duplicateCount,
+    "currentCount" : TabStats.Stats.currentCount
     };
 
     loadStats();
