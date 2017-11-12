@@ -1,33 +1,6 @@
 TabStats = {};
 
 // New Stats Object
-TabStats.OriginalStats = {
-    "activeTab": {
-        "id" : -1,
-        "windowId" : -1,
-        "url" : "",
-        "title" : "",
-        "StartDateInMs" :0
-    },
-    "longest" : {
-        "tab": {
-            "time" : 0,
-            "url" : "",
-            "title" : ""
-        }
-    },
-    "daily" : {
-        "created": 0,
-        "deleted": 0
-    },
-    "total" : {
-        "created": 0,
-        "deleted": 0
-    },
-    "duplicateCount" : 0,
-    "currentCount" : 0,
-};
-
 var tabStatsStorage = {
     settings: {
         firstRun: true,
@@ -50,7 +23,7 @@ var tabStatsStorage = {
         current: {
             count: 0,
             date: new Date(),
-            activeTab: {
+            active: {
                 id: -1,
                 windowId: -1,
                 url: '',
@@ -134,39 +107,54 @@ TabStats.onCloseTab = function() {
    TabStats.saveStats();
 };
 
+TabStats.setLongestTabFromActive = function(totalTime) {
+    TabStats.Storage.stats.longest = {
+        time: totalTime,
+        title: TabStats.Storage.stats.current.active.title,
+        url: TabStats.Storage.stats.current.active.url
+    };
+
+};
+
 TabStats.onActiveTabChange = function(activeInfo) {
-    return;
-	if(activeInfo.windowId == TabStats.Stats.activeTab.windowId) {
-		if(TabStats.Stats.activeTab.id != -1) {
-			if(activeInfo.tabId != TabStats.Stats.activeTab.id) {
-				totalTimeOnActiveTab = Date.now() - TabStats.Stats.activeTab.StartDateInMs; //milliseconds
-				if(totalTimeOnActiveTab > TabStats.Stats.longest.tab.time) {
-					TabStats.Stats.longest.tab.time = totalTimeOnActiveTab;
-					TabStats.Stats.longest.tab.title = TabStats.activeTabTitle;
-					TabStats.Stats.longest.tab.url = TabStats.activeTabUrl;
-                    TabStats.Stats.activeTab.StartDateInMs = Date.now(); //milliseconds
-					TabStats.saveStats();
-				}
+    var totalTime = -1;
+
+	if (activeInfo.windowId === TabStats.Storage.stats.current.active.windowId) { // Ensure we only track the current window
+
+        // If its not a brand new tab and is different from last check
+		if (TabStats.Storage.stats.current.active.id !== -1 && activeInfo.tabId !== TabStats.Storage.stats.current.active.id) {
+
+            TabStats.storeActiveTabData(activeInfo);
+
+            // Calculate delta since first hit
+			totalTime = Date.now() - TabStats.Storage.stats.current.active.startTime;
+
+            // Check to see if it beats the longest tab time
+			if (totalTime > TabStats.Storage.stats.longest.time) {
+                TabStats.setLongestTabFromActive(totalTime);
+                TabStats.Storage.stats.current.active.startTime = Date.now();
 			}
-		}
-		else {
-			TabStats.Stats.activeTab.StartDateInMs = Date.now(); //milliseconds
-		}
-		TabStats.Stats.activeTab.id = activeInfo.tabId;
-		chrome.tabs.get(activeInfo.tabId, function (tab){
-            TabStats.Stats.activeTab.title = tab.title;
-            TabStats.Stats.activeTab.url = tab.url;
-		});
-	}
-	else {
-	    TabStats.Stats.activeTab.StartDateInMs = Date.now(); //milliseconds
-		TabStats.Stats.activeTab.windowId = activeInfo.windowId;
-		TabStats.Stats.activeTab.id = activeInfo.tabId;
-		chrome.tabs.get(activeInfo.tabId, function (tab){
-            TabStats.Stats.activeTab.title = tab.title;
-            TabStats.Stats.activeTab.url = tab.url;
-        });
-	}
+		} else {
+            TabStats.Storage.stats.current.active.id = activeInfo.tabId;
+            TabStats.storeActiveTabData(activeInfo);
+        }
+	} else {
+        TabStats.storeActiveTabData(activeInfo);
+    }
+
+    TabStats.saveStats();
+};
+
+TabStats.storeActiveTabData = function(activeInfo) {
+    chrome.tabs.get(activeInfo.tabId, function (tab){
+        TabStats.Storage.stats.current.active = {
+            startTime: Date.now(),
+            title: tab.title,
+            url: tab.url,
+            windowId: activeInfo.windowId,
+            id: activeInfo.tabId
+        };
+    });
 };
 
 TabStats.isFirstRun = function() {
@@ -265,7 +253,7 @@ function checkDupes(tabArray) {
         counter[key] = (counter[key] || 0) + 1;
         dupes += (counter[key] - 1);
     });
-    TabStats.Storage.stats.totals.duplicate += dupes;
+    TabStats.Storage.stats.totals.duplicated += dupes;
     TabStats.Storage.stats.current.duplicate = dupes;
     TabStats.saveStats();
 }

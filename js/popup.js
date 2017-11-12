@@ -41,7 +41,7 @@ function updateDupCount() {
 
     var elemTotal = document.getElementById('duplicateTotalCount');
     if (elemTotal !== null) {
-		elemTotal.innerHTML = TabStats.Storage.stats.totals.duplicate;
+		elemTotal.innerHTML = TabStats.Storage.stats.totals.duplicated;
 	}
 }
 
@@ -132,19 +132,19 @@ function timeSince(seconds) {
 
 	interval = Math.floor(seconds / 2592000);
 	if (interval > 1)
-		return interval + " months";
+		return interval + "months";
 
 	interval = Math.floor(seconds / 86400);
 	if (interval > 1)
-		return interval + " days";
+		return interval + "d";
 
 	interval = Math.floor(seconds / 3600);
 	if (interval > 1)
-		return interval + " hrs";
+		return interval + "h";
 
 	interval = Math.floor(seconds / 60);
 	if (interval > 1)
-		return interval + " mins";
+		return interval + "m";
 
-	return Math.floor(seconds) + " secs";
+	return Math.floor(seconds) + "s";
 }
