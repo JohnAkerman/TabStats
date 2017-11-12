@@ -33,9 +33,9 @@ function updateDupCount() {
 	if (elem !== null) {
 		elem.innerHTML = TabStats.Storage.stats.current.duplicate;
 		if (TabStats.Storage.stats.current.duplicate) {
-			elem.setAttribute("class", "duplicateHighlight");
+			elem.classList.add("stat-list__value--highlight");
 		} else {
-			elem.removeAttribute("class");
+            elem.classList.remove("stat-list__value--highlight");
 		}
 	}
 
