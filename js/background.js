@@ -1,28 +1,7 @@
 TabStats = {};
 
-// TabStats.currentCount = 0;
-// TabStats.totalCreated = 0;
-// TabStats.totalDeleted = 0;
-// TabStats.showValue = 1;
-
-// TabStats.dailyCreatedCount = 0;
-// TabStats.dailyDeletedCount = 0;
-
-//Note this is the active tab for the current window
-
-// TabStats.activeTabId = -1;
-// TabStats.activeTabTitle = "";
-// TabStats.activeTabUrl = "";
-// TabStats.windowIdOfActiveTab = -1;
-
-// TabStats.longestTimeOnTab = 0; //milliseconds
-// TabStats.longestTimeOnTabTitle = "";
-// TabStats.longestTimeOnTabUrl = "";
-
-// TabStats.duplicateCount = 0;
-
 // New Stats Object
-TabStats.Stats = {
+TabStats.OriginalStats = {
     "activeTab": {
         "id" : -1,
         "windowId" : -1,
@@ -47,22 +26,76 @@ TabStats.Stats = {
     },
     "duplicateCount" : 0,
     "currentCount" : 0,
-}
+};
 
-// Settings Object
-TabStats.Settings = {
-    "showValue" : 1
-}
+var tabStatsStorage = {
+    settings: {
+        firstRun: true,
+        firstRunDate: new Date(),
+        showStats: true,
+        showValue: "CURRENT",
+        version: 2.0
+    },
+    stats: {
+        totals: {
+            created: 0,
+            deleted: 0,
+            duplicated: 0
+        },
+        longest: {
+            time: 0,
+            title: '',
+            url: ''
+        },
+        current: {
+            count: 0,
+            date: new Date(),
+            activeTab: {
+                id: -1,
+                windowId: -1,
+                url: '',
+                title: '',
+                startTime: 0,
+            }
+        }
+    }
+};
+
+
+// Clear stats
+TabStats.resetStats = function() {
+    TabStats.Storage = tabStatsStorage;
+};
+
+TabStats.clearTotalDeleted = function() {
+    TabStats.Storage.stats.totals.deleted = 0;
+    TabStats.saveStats();
+    TabStats.updateRender();
+};
+
+TabStats.clearLongestTab = function() {
+    TabStats.Storage.stats.longest = tabStatsStorage.stats.longest;
+    TabStats.saveStats();
+    TabStats.updateRender();
+};
 
 TabStats.init = function() {
 	TabStats.checkFirstRun();
 
+    // Tab Event Listeners
 	chrome.tabs.onCreated.addListener(TabStats.onNewTab);
 	chrome.tabs.onRemoved.addListener(TabStats.onCloseTab);
     chrome.tabs.onActivated.addListener(TabStats.onActiveTabChange);
-	localStorage.setItem('Settings.showValue', TabStats.Settings.showValue);
-    TabStats.renderValue();
-}
+
+    // Get Current Tab Count
+    chrome.windows.getAll({populate: true}, function (windows) {
+        TabStats.Storage.stats.current.count = 0;
+        for(var i = 0; i < windows.length; i++) {
+            TabStats.Storage.stats.current.count += windows[i].tabs.length;
+            TabStats.updateRender();
+        }
+    });
+};
 
 TabStats.dayChangeResetter = function() {
 
@@ -72,49 +105,36 @@ TabStats.dayChangeResetter = function() {
 	if (now.getDate() != TabStats.dailyDate.getDate()) {
 		TabStats.Stats.daily.created = 0;
 		TabStats.Stats.daily.deleted = 0;
-		TabStats.dailyDate = now;		
+		TabStats.dailyDate = now;
 	}
-}
+};
 
 TabStats.clearStats = function() {
-	localStorage.setItem("Stats.total.created", 0);
-	localStorage.setItem("Stats.total.deleted", 0);
-    localStorage.setItem('Stats.daily.created', 0);
-    localStorage.setItem('Stats.dailyDate', 0);
-
-    // Reset longest
-    localStorage.setItem('Stats.longest.tab.time', 0);
-    localStorage.setItem('Stats.longest.tab.title', 0);
-	localStorage.setItem('Stats.longest.tab.url', 0);
-}
+    localStorage.setItem("TabStats", JSON.stringify(tabStatsStorage));
+};
 
 TabStats.onNewTab = function() {
-    TabStats.Stats.currentCount++;
-	TabStats.Stats.total.created++;
-	
-	TabStats.dayChangeResetter();
-	
-	TabStats.dailyCreatedCount++;
+    TabStats.Storage.stats.current.count++;
+    TabStats.Storage.stats.totals.created++;
 
-    TabStats.renderValue();
-	
+	// TabStats.dayChangeResetter();
+
+    TabStats.updateRender();
 	TabStats.saveStats();
-}
+};
 
 TabStats.onCloseTab = function() {
-   TabStats.Stats.currentCount--;
-   TabStats.Stats.total.deleted++;
-   
-   TabStats.dayChangeResetter();
+   TabStats.Storage.stats.current.count--;
+   TabStats.Storage.stats.totals.deleted++;
 
-   TabStats.dailyDeletedCount++;
-   
-   TabStats.renderValue();
-   
+   // TabStats.dayChangeResetter();
+
+   TabStats.updateRender();
    TabStats.saveStats();
-} 
+};
 
 TabStats.onActiveTabChange = function(activeInfo) {
+    return;
 	if(activeInfo.windowId == TabStats.Stats.activeTab.windowId) {
 		if(TabStats.Stats.activeTab.id != -1) {
 			if(activeInfo.tabId != TabStats.Stats.activeTab.id) {
@@ -146,121 +166,109 @@ TabStats.onActiveTabChange = function(activeInfo) {
             TabStats.Stats.activeTab.url = tab.url;
         });
 	}
-}
+};
+
+TabStats.isFirstRun = function() {
+    return (window.localStorage.getItem("TabStats") === null ? true : false);
+};
 
 TabStats.checkFirstRun = function() {
-	if (!window.localStorage.getItem("Settings.firstRun")) {
-		TabStats.firstRun();
-	}
-	TabStats.loadStats();
-    TabStats.dailyDate = new Date(localStorage.getItem('dailyDate'));
-}
-
-TabStats.firstRun = function() {
-    localStorage.setItem('Settings.firstRun', 'true');
-    localStorage.setItem('Settings.firstRunDate', new Date());
-    localStorage.setItem("Settings.showStat", 'true');
-    localStorage.setItem("Stats.total.created", 0);
-    localStorage.setItem("Stats.total.deleted", 0);
-    localStorage.setItem('Stats.daily.created', 0);
-    localStorage.setItem('dailyDate', new Date());
-	localStorage.setItem('Stats.longest.tab.time', 0);
-	localStorage.setItem('Stats.longest.tab.title', "");
-	localStorage.setItem('Stats.longest.tab.url', "");
-}
-
-TabStats.loadStats = function() {
-    if (localStorage.getItem("firstRun")) {
-        TabStats.Stats.total.created = parseInt(localStorage.getItem("Stats.total.created"), 10);
-        TabStats.Stats.total.deleted = parseInt(localStorage.getItem("Stats.total.deleted"), 10);
-        TabStats.Stats.daily.created = parseInt(localStorage.getItem("Stats.daily.created"), 10);
-		TabStats.Stats.longest.tab.time = parseInt(localStorage.getItem("Stats.longest.tab.time"), 10);
-		TabStats.Stats.longest.tab.title = localStorage.getItem("Stats.longest.tab.title");
-        TabStats.Stats.longest.tab.url = localStorage.getItem("Stats.longest.tab.url");
+    if (TabStats.isFirstRun()) {
+        TabStats.Storage = tabStatsStorage;
+        TabStats.saveStats();
+    } else {
+        TabStats.Storage = JSON.parse(localStorage.getItem("TabStats"));
     }
-}
+};
 
 TabStats.saveStats = function() {
-    localStorage.setItem("Stats.total.created", TabStats.Stats.total.created);
-    localStorage.setItem("Stats.total.deleted", TabStats.Stats.total.deleted);
-    localStorage.setItem('Stats.daily.created', TabStats.Stats.daily.created);
-    localStorage.setItem('dailyDate', TabStats.dailyDate);
-	localStorage.setItem('Stats.longest.tab.time', TabStats.Stats.longest.tab.time);
-	localStorage.setItem('Stats.longest.tab.title', TabStats.Stats.longest.tab.title);
-    localStorage.setItem('Stats.longest.tab.url', TabStats.Stats.longest.tab.url);
+    localStorage.setItem("TabStats", JSON.stringify(TabStats.Storage));
+};
+
+TabStats.updateRender = function() {
+
+    if (TabStats.Storage.settings.showStats === false) {
+        chrome.browserAction.setBadgeText({text: ''}); // Show empty string
+        return false;
+    } else {
+
+    	switch(TabStats.Storage.settings.showValue) {
+
+    		// Current Count
+    		case "CURRENT":
+                updateBrowserBadge(
+                    numberOutput(TabStats.Storage.stats.current.count),
+                    'TabStats - ' + TabStats.Storage.stats.current.count + ' tabs currently open',
+                     "#5885E4"
+                );
+		          break;
+
+    		// Total Created
+    		case "CREATED":
+                updateBrowserBadge(
+                    numberOutput(TabStats.Storage.stats.totals.created),
+                    'TabStats - ' + TabStats.Storage.stats.totals.created + ' tabs created',
+                     "#4E9C4E"
+                );
+	          break;
+
+    		// Total Deleted
+    		case "DELETED":
+                updateBrowserBadge(
+                    numberOutput(TabStats.Storage.stats.totals.deleted),
+                    'TabStats - ' + TabStats.Storage.stats.totals.deleted + ' tabs deleted',
+                     "#CF1E1E"
+                );
+               break;
+
+            default:
+                updateBrowserBadge(
+                    numberOutput(TabStats.Storage.stats.current.count),
+                    'TabStats - ' + TabStats.Storage.stats.current.count + ' tabs currently open',
+                     "#5885E4"
+                );
+                break;
+        }
+
+
+	}
+};
+
+function updateBrowserBadge(text, title, color) {
+    chrome.browserAction.setBadgeText({text: text.toString()});
+    chrome.browserAction.setTitle({title: title});
+    chrome.browserAction.setBadgeBackgroundColor({color: color});
 }
 
-TabStats.thousandCheck = function(val) {
+function numberOutput(val) {
     return (val > 1000 ? (val /1000).toFixed(1) + 'k' : val);
 }
 
-TabStats.renderValue = function() {
-	TabStats.Settings.showValue = parseInt(localStorage.getItem("Settings.showValue"), 10);
-
-    TabStats.Settings.shouldShow = localStorage.getItem("Settings.showStat");
-
-    if (TabStats.Settings.shouldShow == "true") {
-		switch(TabStats.Settings.showValue) {
-
-			// Current Count
-			case 1: 
-	   			chrome.browserAction.setBadgeText({text: TabStats.thousandCheck(TabStats.Stats.currentCount) + ''});
-	   			chrome.browserAction.setBadgeBackgroundColor({color: "#5885E4"});
-	   			chrome.browserAction.setTitle({title: 'TabStats - ' + TabStats.Stats.currentCount + ' tabs currently open'});
-			break;
-
-			// Total Created
-			case 2:
-	   			chrome.browserAction.setBadgeText({text: TabStats.thousandCheck(TabStats.Stats.total.created) + ''});
-	   			chrome.browserAction.setBadgeBackgroundColor({color: "#4E9C4E"});
-	   			chrome.browserAction.setTitle({title: 'TabStats - ' + TabStats.Stats.total.created + ' tabs created total'});
-			break;
-			
-			// Total Deleted
-			case 3:
-			    chrome.browserAction.setBadgeText({text: TabStats.thousandCheck(TabStats.Stats.total.deleted) + ''});
-	   			chrome.browserAction.setBadgeBackgroundColor({color: "#CF1E1E"});
-	   			chrome.browserAction.setTitle({title: 'TabStats - ' + TabStats.Stats.total.deleted + ' tabs deleted total'});
-			break;
-		}
-	} else {
-	    chrome.browserAction.setBadgeText({text: ''}); // Show empty string
-	}
-}
-
-// Call init on load
-window.addEventListener("load", TabStats.init, false);
-
-tabArray = Array();
-chrome.windows.getAll({populate: true}, function (windows) {
-    for(var i = 0; i < windows.length; i++) {
-        TabStats.Stats.currentCount += windows[i].tabs.length;
-        TabStats.renderValue();
-    }
-});
-
 TabStats.duplicateCheck = function(callback) {
-    tabArray = Array();
+    var tabArray = Array();
     chrome.windows.getAll({populate: true}, function (windows) {
         for(var i = 0; i < windows.length; i++) {
             for(var j = 0; j < windows[i].tabs.length; j++) {
-                tabArray.push(windows[i].tabs[j].title);                
+                tabArray.push(windows[i].tabs[j].title);
             }
         }
         checkDupes(tabArray);
         callback();
     });
-}
+};
 
 // Count up the dupes
 function checkDupes(tabArray) {
-    counter = {}
+    counter = {};
     dupes = 0;
     tabArray.forEach(function(obj) {
-        var key = JSON.stringify(obj)
-        counter[key] = (counter[key] || 0) + 1
+        var key = JSON.stringify(obj);
+        counter[key] = (counter[key] || 0) + 1;
         dupes += (counter[key] - 1);
     });
-    TabStats.Stats.duplicateCount = dupes;
+    TabStats.Storage.stats.totals.duplicate = dupes;
     TabStats.saveStats();
 }
+
+// Call init on load
+window.addEventListener("load", TabStats.init, false);
