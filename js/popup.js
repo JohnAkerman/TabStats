@@ -21,7 +21,8 @@ function setupEventListeners() {
 	document.getElementById("showStat").addEventListener("click", toggleShowStats, false);
 	document.getElementById("showCurrent").addEventListener("click", showCurrent, false);
 	document.getElementById("showCreated").addEventListener("click", showCreated, false);
-	document.getElementById("showDeleted").addEventListener("click", showDeleted, false);
+    document.getElementById("showDeleted").addEventListener("click", showDeleted, false);
+	document.getElementById("showMuted").addEventListener("click", showMuted, false);
 	document.getElementById("exportStats").addEventListener("click", exportStats, false);
 	document.getElementById("deletedReset").addEventListener("click", deletedReset, false);
 	document.getElementById("longestReset").addEventListener("click", longestReset, false);
@@ -65,6 +66,8 @@ function renderPopupStats() {
 	document.getElementById('longestTimeOnTab').innerHTML = timeSince(TabStats.Storage.stats.longest.time / 1000);
 	document.getElementById('longestTabName').setAttribute("title", TabStats.Storage.stats.longest.title);
     document.getElementById('duplicateTotalCount').innerHTML = TabStats.Storage.stats.totals.duplicate;
+    document.getElementById('mutedCount').innerHTML = TabStats.Storage.stats.current.muted;
+    document.getElementById('mutedTotalCount').innerHTML = TabStats.Storage.stats.totals.muted;
 
     setRadioValue("showStatType", TabStats.Storage.settings.showValue);
 
@@ -121,6 +124,11 @@ function showCreated() {
 
 function showDeleted() {
     TabStats.Storage.settings.showValue = "DELETED";
+	TabStats.updateRender();
+}
+
+function showMuted() {
+    TabStats.Storage.settings.showValue = "MUTED";
 	TabStats.updateRender();
 }
 
