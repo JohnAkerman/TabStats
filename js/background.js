@@ -13,7 +13,8 @@ var tabStatsStorage = {
         totals: {
             created: 0,
             deleted: 0,
-            duplicated: 0
+            duplicated: 0,
+            muted: 0
         },
         longest: {
             time: 0,
@@ -30,7 +31,8 @@ var tabStatsStorage = {
                 title: '',
                 startTime: 0,
             },
-            duplicate: 0
+            duplicate: 0,
+            muted: 0
         }
     }
 };
@@ -53,6 +55,8 @@ TabStats.clearLongestTab = function() {
     TabStats.updateRender();
 };
 
+var mutedTabs = [];
+
 TabStats.init = function() {
 	TabStats.checkFirstRun();
 
@@ -60,14 +64,26 @@ TabStats.init = function() {
 	chrome.tabs.onCreated.addListener(TabStats.onNewTab);
 	chrome.tabs.onRemoved.addListener(TabStats.onCloseTab);
     chrome.tabs.onActivated.addListener(TabStats.onActiveTabChange);
+    chrome.tabs.onUpdated.addListener(TabStats.onUpdatedTab);
 
     // Get Current Tab Count
     chrome.windows.getAll({populate: true}, function (windows) {
         TabStats.Storage.stats.current.count = 0;
+        TabStats.Storage.stats.current.muted = 0;
+
         for(var i = 0; i < windows.length; i++) {
             TabStats.Storage.stats.current.count += windows[i].tabs.length;
-            TabStats.updateRender();
+
+            for(var j = 0; j < windows[i].tabs.length; j++) {
+
+                // Check to see if any tabs are muted
+                if (windows[i].tabs[j].mutedInfo.muted) {
+                    TabStats.Storage.stats.current.muted++;
+                    mutedTabs.push(windows[i].tabs[j].tabId);
+                }
+            }
         }
+        TabStats.updateRender();
     });
 };
 
@@ -85,6 +101,32 @@ TabStats.dayChangeResetter = function() {
 
 TabStats.clearStats = function() {
     localStorage.setItem("TabStats", JSON.stringify(tabStatsStorage));
+};
+
+TabStats.onUpdatedTab = function(tabId, changedInfo, tab) {
+    // console.log(tabId, changedInfo, tab);
+    // If it muted the tab
+    if (typeof changedInfo.mutedInfo !== "undefined") {
+        if (changedInfo.mutedInfo.muted) {
+            TabStats.Storage.stats.totals.muted++;
+            TabStats.Storage.stats.current.muted++;
+            mutedTabs.push(tabId);
+        }
+        else {
+            var index = mutedTabs.indexOf(tabId);
+            if (index > -1) {
+                mutedTabs.splice(index, 1);
+            }
+        }
+    }
+
+    TabStats.updatedMutedCount();
+    TabStats.saveStats();
+    TabStats.updateRender();
+};
+
+TabStats.updatedMutedCount = function() {
+    TabStats.Storage.stats.current.muted = mutedTabs.length;
 };
 
 TabStats.onNewTab = function() {
@@ -113,7 +155,6 @@ TabStats.setLongestTabFromActive = function(totalTime) {
         title: TabStats.Storage.stats.current.active.title,
         url: TabStats.Storage.stats.current.active.url
     };
-
 };
 
 TabStats.onActiveTabChange = function(activeInfo) {
@@ -209,6 +250,15 @@ TabStats.updateRender = function() {
                      "#CF1E1E"
                 );
                break;
+
+           // Total Deleted
+       		case "MUTED":
+                   updateBrowserBadge(
+                       numberOutput(TabStats.Storage.stats.current.muted),
+                       'TabStats - ' + TabStats.Storage.stats.current.muted + ' tabs currently muted',
+                        "#888888"
+                   );
+                  break;
 
             default:
                 updateBrowserBadge(
