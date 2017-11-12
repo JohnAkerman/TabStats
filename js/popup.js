@@ -29,14 +29,19 @@ function setupEventListeners() {
 }
 
 function updateDupCount() {
-	var elem = document.getElementById('duplicateCount');
+    var elem = document.getElementById('duplicateCount');
 	if (elem !== null) {
-		elem.innerHTML = TabStats.Stats.duplicateCount;
-		if (TabStats.Stats.duplicateCount) {
+		elem.innerHTML = TabStats.Storage.stats.current.duplicate;
+		if (TabStats.Storage.stats.current.duplicate) {
 			elem.setAttribute("class", "duplicateHighlight");
 		} else {
 			elem.removeAttribute("class");
 		}
+	}
+
+    var elemTotal = document.getElementById('duplicateTotalCount');
+    if (elemTotal !== null) {
+		elemTotal.innerHTML = TabStats.Storage.stats.totals.duplicate;
 	}
 }
 
@@ -59,6 +64,8 @@ function renderPopupStats() {
 	document.getElementById('totalDeleted').innerHTML = TabStats.Storage.stats.totals.deleted;
 	document.getElementById('longestTimeOnTab').innerHTML = timeSince(TabStats.Storage.stats.longest.time / 1000);
 	document.getElementById('longestTabName').setAttribute("title", TabStats.Storage.stats.longest.title);
+    document.getElementById('duplicateTotalCount').innerHTML = TabStats.Storage.stats.totals.duplicate;
+
     setRadioValue("showStatType", TabStats.Storage.settings.showValue);
 
     // Get current window tab count

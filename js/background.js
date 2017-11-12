@@ -56,7 +56,8 @@ var tabStatsStorage = {
                 url: '',
                 title: '',
                 startTime: 0,
-            }
+            },
+            duplicate: 0
         }
     }
 };
@@ -229,8 +230,6 @@ TabStats.updateRender = function() {
                 );
                 break;
         }
-
-
 	}
 };
 
@@ -266,7 +265,8 @@ function checkDupes(tabArray) {
         counter[key] = (counter[key] || 0) + 1;
         dupes += (counter[key] - 1);
     });
-    TabStats.Storage.stats.totals.duplicate = dupes;
+    TabStats.Storage.stats.totals.duplicate += dupes;
+    TabStats.Storage.stats.current.duplicate = dupes;
     TabStats.saveStats();
 }
 
