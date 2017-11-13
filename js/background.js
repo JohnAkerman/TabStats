@@ -62,6 +62,8 @@ TabStats.clearLongestTab = function() {
 var mutedTabs = [];
 var pinnedTabs = [];
 var incognitoTabs = [];
+var tabArray = [];
+var tabDupArray = [];
 
 TabStats.init = function() {
 	TabStats.checkFirstRun();
@@ -91,20 +93,26 @@ TabStats.init = function() {
                 // Check to see if any tabs are muted
                 if (windows[i].tabs[j].mutedInfo.muted) {
                     TabStats.Storage.stats.current.muted++;
-                    mutedTabs.push(windows[i].tabs[j].tabId);
+                    mutedTabs.push(windows[i].tabs[j].id);
                 }
 
                 if (windows[i].tabs[j].pinned) {
                     TabStats.Storage.stats.current.pinned++;
-                    pinnedTabs.push(windows[i].tabs[j].tabId);
+                    pinnedTabs.push(windows[i].tabs[j].id);
                 }
 
                 if (TabStats.Storage.settings.allowedIncognito && windows[i].tabs[j].incognito) {
                     TabStats.Storage.stats.current.incognito++;
-                    incognitoTabs.push(windows[i].tabs[j].tabId);
+                    incognitoTabs.push(windows[i].tabs[j].id);
+                }
+
+                if (tabDupArray.indexOf(windows[i].tabs[j].id) === -1) {
+                    tabArray.push({title: windows[i].tabs[j].title, id: windows[i].tabs[j].id});
+                    tabDupArray.push(windows[i].tabs[j].id);
                 }
             }
         }
+        TabStats.checkDupes(false);
         TabStats.updateRender();
     });
 };
@@ -171,7 +179,14 @@ TabStats.onNewTab = function(tab) {
         incognitoTabs.push(tab.id);
     }
 
+    if (tabDupArray.indexOf(tab.id) === -1) {
+        tabArray.push({title: tab.title, id: tab.id});
+        tabDupArray.push(tab.id);
+    }
+
 	// TabStats.dayChangeResetter();
+
+    TabStats.checkDupes(true);
 
     TabStats.updateRender();
 	TabStats.saveStats();
@@ -193,12 +208,19 @@ TabStats.onCloseTab = function(tab) {
        incognitoTabs.splice(index, 1);
    }
 
+   index = tabDupArray.indexOf(tab);
+   if (index > -1) {
+       TabStats.Storage.stats.current.duplicate--;
+       tabArray.splice(index, 1);
+       tabDupArray.splice(index, 1);
+   }
+
    // TabStats.dayChangeResetter();
    TabStats.Storage.stats.current.pinned = pinnedTabs.length;
    TabStats.Storage.stats.current.incognito = incognitoTabs.length;
 
-   TabStats.updateRender();
    TabStats.saveStats();
+   TabStats.updateRender();
 };
 
 TabStats.setLongestTabFromActive = function(totalTime) {
@@ -333,32 +355,29 @@ function numberOutput(val) {
     return (val > 1000 ? (val /1000).toFixed(1) + 'k' : val);
 }
 
-TabStats.duplicateCheck = function(callback) {
-    var tabArray = Array();
-    chrome.windows.getAll({populate: true}, function (windows) {
-        for(var i = 0; i < windows.length; i++) {
-            for(var j = 0; j < windows[i].tabs.length; j++) {
-                tabArray.push(windows[i].tabs[j].title);
-            }
-        }
-        checkDupes(tabArray);
-        callback();
-    });
-};
-
 // Count up the dupes
-function checkDupes(tabArray) {
+TabStats.checkDupes = function(addToTotal, cb) {
     counter = {};
     dupes = 0;
-    tabArray.forEach(function(obj) {
-        var key = JSON.stringify(obj);
-        counter[key] = (counter[key] || 0) + 1;
-        dupes += (counter[key] - 1);
+    TabStats.Storage.stats.current.duplicate = 0;
+
+    var counts = {};
+    tabArray.forEach(function(x) { counts[x.title] = (counts[x.title] || 0) + 1; });
+
+    Object.keys(counts).forEach(function(key) {
+        if (counts[key] > 1) dupes += counts[key];
     });
-    TabStats.Storage.stats.totals.duplicated += dupes;
-    TabStats.Storage.stats.current.duplicate = dupes;
+
+    TabStats.Storage.stats.current.duplicate = (dupes > 0 ? dupes -= 1 : 0);
+
+    if (addToTotal) {
+        TabStats.Storage.stats.totals.duplicated++;
+    }
+    TabStats.updateRender();
     TabStats.saveStats();
-}
+
+    if (cb) cb();
+};
 
 // Call init on load
 window.addEventListener("load", TabStats.init, false);
