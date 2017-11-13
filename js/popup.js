@@ -112,8 +112,8 @@ function toggleShowStats() {
 
 function exportStats() {
 	importfield = document.getElementById("importValue");
-	if (exportfield != null) {
-		 exportfield.remove();
+	if (importfield != null) {
+		 importfield.remove();
 		 document.getElementById('applyImport').remove();
 	}
   if (document.getElementById("exportValue") == null) {
