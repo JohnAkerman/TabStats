@@ -95,14 +95,17 @@ function toggleShowStats() {
 }
 
 function exportStats() {
-	var obj = JSON.stringify(TabStats.Storage.stats);
+  if (document.getElementById("exportValue") == null) {
 
-	var expStr = document.createElement("input");
-	expStr.setAttribute("value", obj);
-	expStr.setAttribute("id", "exportValue");
+		var obj = JSON.stringify(TabStats.Storage.stats);
 
-	document.getElementById("stat-controls").appendChild(expStr);
-	document.getElementById("exportValue").select();
+		var expStr = document.createElement("input");
+		expStr.setAttribute("value", obj);
+		expStr.setAttribute("id", "exportValue");
+
+		document.getElementById("stat-controls").appendChild(expStr);
+		document.getElementById("exportValue").select();
+	}
 }
 
 function updateShowStatsCheckbox() {
