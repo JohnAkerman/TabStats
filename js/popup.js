@@ -14,8 +14,6 @@ function init() {
 
     renderPopupStats();
     TabStats.checkDupes(false, function() {
-
-        console.log("callback");
         updateDupCount();
     });
 
@@ -28,7 +26,7 @@ function setupEventListeners() {
 	document.getElementById("showCreated").addEventListener("click", showCreated, false);
     document.getElementById("showDeleted").addEventListener("click", showDeleted, false);
 	document.getElementById("showMuted").addEventListener("click", showMuted, false);
-	document.getElementById("exportStats").addEventListener("click", exportStats, false);
+	document.getElementById("exportStats").addEventListener("click", exportStatFile, false);
 	document.getElementById("importStats").addEventListener("click", displayImportStatsField, false);
 	document.getElementById("deletedReset").addEventListener("click", deletedReset, false);
 	document.getElementById("longestReset").addEventListener("click", longestReset, false);
@@ -110,7 +108,24 @@ function toggleShowStats() {
 	TabStats.updateRender();
 }
 
+function exportStatFile() {
+	var fileBuffer = 'data:text/json;charset=utf-8,';
+	var fileObj = JSON.stringify(TabStats.Storage.stats);
+	var exportBtn = document.getElementById('exportStats');
+
+	fileBuffer += encodeURIComponent(fileObj);
+
+	// Setup the export button attributes
+	exportBtn.setAttribute('href', fileBuffer);
+	exportBtn.setAttribute('download', 'tabstats.json');
+	exportBtn.click();
+
+	// Reset the button's action after click
+	// document.getElementById("exportStats").addEventListener("click", exportStatFile, false);
+}
+
 function exportStats() {
+
 	importfield = document.getElementById("importValue");
 	if (importfield != null) {
 		 importfield.remove();
