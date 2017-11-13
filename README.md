@@ -35,5 +35,7 @@ Total Tabs Created | The total number of tabs opened since installation.
 Total Tabs Deleted | The total number of tabs deleted since installation.
 Total Duplicate Tabs | The total number of duplicated tabs since installation.
 
+## Contributing
+Contributes are welcome on this project, please read the [Contributing document](https://github.com/JohnAkerman/TabStats/blob/master/CONTRIBUTING.md) for further information.
 ## License
 [MIT License](https://opensource.org/licenses/MIT)
