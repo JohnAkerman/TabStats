@@ -118,10 +118,6 @@ function exportStatFile() {
 	// Setup the export button attributes
 	exportBtn.setAttribute('href', fileBuffer);
 	exportBtn.setAttribute('download', 'tabstats.json');
-	exportBtn.click();
-
-	// Reset the button's action after click
-	// document.getElementById("exportStats").addEventListener("click", exportStatFile, false);
 }
 
 function exportStats() {
