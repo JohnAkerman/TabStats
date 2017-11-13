@@ -15,7 +15,8 @@ var tabStatsStorage = {
             deleted: 0,
             duplicated: 0,
             muted: 0,
-            pinned: 0
+            pinned: 0,
+            incognito: 0
         },
         longest: {
             time: 0,
@@ -34,7 +35,8 @@ var tabStatsStorage = {
             },
             duplicate: 0,
             muted: 0,
-            pinned: 0
+            pinned: 0,
+            incognito: 0
         }
     }
 };
@@ -59,9 +61,14 @@ TabStats.clearLongestTab = function() {
 
 var mutedTabs = [];
 var pinnedTabs = [];
+var incognitoTabs = [];
 
 TabStats.init = function() {
 	TabStats.checkFirstRun();
+
+    chrome.extension.isAllowedIncognitoAccess(function(isAllowed) {
+        TabStats.Storage.settings.allowedIncognito = isAllowed;
+    });
 
     // Tab Event Listeners
 	chrome.tabs.onCreated.addListener(TabStats.onNewTab);
@@ -74,6 +81,7 @@ TabStats.init = function() {
         TabStats.Storage.stats.current.count = 0;
         TabStats.Storage.stats.current.muted = 0;
         TabStats.Storage.stats.current.pinned = 0;
+        TabStats.Storage.stats.current.incognito = 0;
 
         for(var i = 0; i < windows.length; i++) {
             TabStats.Storage.stats.current.count += windows[i].tabs.length;
@@ -89,6 +97,11 @@ TabStats.init = function() {
                 if (windows[i].tabs[j].pinned) {
                     TabStats.Storage.stats.current.pinned++;
                     pinnedTabs.push(windows[i].tabs[j].tabId);
+                }
+
+                if (TabStats.Storage.settings.allowedIncognito && windows[i].tabs[j].incognito) {
+                    TabStats.Storage.stats.current.incognito++;
+                    incognitoTabs.push(windows[i].tabs[j].tabId);
                 }
             }
         }
@@ -129,7 +142,7 @@ TabStats.onUpdatedTab = function(tabId, changedInfo, tab) {
         }
     }
 
-    if (changedInfo.pinned) {
+    if (tab.pinned) {
         TabStats.Storage.stats.totals.pinned++;
         TabStats.Storage.stats.current.pinned++;
         pinnedTabs.push(tabId);
@@ -148,9 +161,15 @@ TabStats.onUpdatedTab = function(tabId, changedInfo, tab) {
     TabStats.updateRender();
 };
 
-TabStats.onNewTab = function() {
+TabStats.onNewTab = function(tab) {
     TabStats.Storage.stats.current.count++;
     TabStats.Storage.stats.totals.created++;
+
+    if (TabStats.Storage.settings.allowedIncognito && tab.incognito) {
+        TabStats.Storage.stats.totals.incognito++;
+        TabStats.Storage.stats.current.incognito++;
+        incognitoTabs.push(tab.id);
+    }
 
 	// TabStats.dayChangeResetter();
 
@@ -158,11 +177,25 @@ TabStats.onNewTab = function() {
 	TabStats.saveStats();
 };
 
-TabStats.onCloseTab = function() {
+TabStats.onCloseTab = function(tab) {
    TabStats.Storage.stats.current.count--;
    TabStats.Storage.stats.totals.deleted++;
 
+   var index = pinnedTabs.indexOf(tab);
+   if (index > -1) {
+       TabStats.Storage.stats.current.pinned--;
+       pinnedTabs.splice(index, 1);
+   }
+
+   index = incognitoTabs.indexOf(tab);
+   if (index > -1) {
+       TabStats.Storage.stats.current.incognito--;
+       incognitoTabs.splice(index, 1);
+   }
+
    // TabStats.dayChangeResetter();
+   TabStats.Storage.stats.current.pinned = pinnedTabs.length;
+   TabStats.Storage.stats.current.incognito = incognitoTabs.length;
 
    TabStats.updateRender();
    TabStats.saveStats();

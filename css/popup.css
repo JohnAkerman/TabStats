@@ -22,6 +22,10 @@ h1 {
 	padding-top: 50px;
 }
 
+.hide {
+	display: none;
+}
+
 #reset{
 	cursor: pointer;
 	color: #e74c00;
@@ -126,7 +130,7 @@ h1 {
 	float: right;
 }
 
-#exportStats.hide {
+#exportStats {
 	visibility: hidden;
 }
 
