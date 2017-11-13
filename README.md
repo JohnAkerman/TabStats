@@ -5,7 +5,9 @@
 [![GitHub license](https://img.shields.io/github/license/JohnAkerman/TabStats.svg)](https://github.com/JohnAkerman/TabStats/blob/master/LICENSE)&nbsp;&nbsp;
 [![GitHub issues](https://img.shields.io/github/issues/JohnAkerman/TabStats.svg)](https://github.com/JohnAkerman/TabStats/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/JohnAkerman/TabStats.svg)](https://github.com/JohnAkerman/TabStats/issues?q=is%3Aissue+is%3Aclosed)
+[![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/JohnAkerman/TabStats.svg)](https://github.com/JohnAkerman/TabStats/pulls?q=is%3Apr+is%3Aclosed)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/JohnAkerman/TabStats/issues)
+
 
 ## What is TabStats?
 TabStats is a Chrome Extension that accumulates statistics of your tab usage based on your behaviour and presents them to you in a easy to use popup. **We do not store or send any of your page history**
