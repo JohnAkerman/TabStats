@@ -95,7 +95,7 @@ function toggleShowStats() {
 }
 
 function exportStats() {
-	var obj = JSON.stringify(TabStats.Storage.Stats);
+	var obj = JSON.stringify(TabStats.Storage.stats);
 
 	var expStr = document.createElement("input");
 	expStr.setAttribute("value", obj);

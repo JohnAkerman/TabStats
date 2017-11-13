@@ -126,10 +126,6 @@ h1 {
 	float: right;
 }
 
-#exportStats.hide {
-	visibility: hidden;
-}
-
 .author {
 	margin: 5px 0 -15px 0;
 	font-size: 11px;
