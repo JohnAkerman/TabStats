@@ -4,6 +4,7 @@
 
 [![GitHub license](https://img.shields.io/github/license/JohnAkerman/TabStats.svg)](https://github.com/JohnAkerman/TabStats/blob/master/LICENSE)&nbsp;&nbsp;
 [![GitHub issues](https://img.shields.io/github/issues/JohnAkerman/TabStats.svg)](https://github.com/JohnAkerman/TabStats/issues)
+[![GitHub closed issues](https://img.shields.io/github/issues-closed/JohnAkerman/TabStats.svg)](https://github.com/JohnAkerman/TabStats/issues?q=is%3Aissue+is%3Aclosed)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/JohnAkerman/TabStats/issues)
 
 ## What is TabStats?
@@ -35,5 +36,7 @@ Total Tabs Created | The total number of tabs opened since installation.
 Total Tabs Deleted | The total number of tabs deleted since installation.
 Total Duplicate Tabs | The total number of duplicated tabs since installation.
 
+## Contributing
+Contributes are welcome on this project, please read the [Contributing document](https://github.com/JohnAkerman/TabStats/blob/master/CONTRIBUTING.md) for further information.
 ## License
 [MIT License](https://opensource.org/licenses/MIT)
