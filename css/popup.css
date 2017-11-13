@@ -116,7 +116,7 @@ h1 {
 	font-size: 12px;
 }
 
-#exportValue {
+#exportValue #importValue {
 	background: rgba(223,223,223,0.28);
 	border: 1px solid #D5D5D5;
 	padding: 4px 0;
@@ -125,8 +125,12 @@ h1 {
 	border-radius: 3px;
 	margin: 3px 0;
 }
-
+/*
 #clearAllStats {
+	float: right;
+}*/
+
+#applyImport {
 	float: right;
 }
 

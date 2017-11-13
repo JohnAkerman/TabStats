@@ -29,6 +29,7 @@ function setupEventListeners() {
     document.getElementById("showDeleted").addEventListener("click", showDeleted, false);
 	document.getElementById("showMuted").addEventListener("click", showMuted, false);
 	document.getElementById("exportStats").addEventListener("click", exportStats, false);
+	document.getElementById("importStats").addEventListener("click", displayImportStatsField, false);
 	document.getElementById("deletedReset").addEventListener("click", deletedReset, false);
 	document.getElementById("longestReset").addEventListener("click", longestReset, false);
 	document.getElementById("clearAllStats").addEventListener("click", clearAllStats, false);
@@ -110,6 +111,11 @@ function toggleShowStats() {
 }
 
 function exportStats() {
+	importfield = document.getElementById("importValue");
+	if (exportfield != null) {
+		 exportfield.remove();
+		 document.getElementById('applyImport').remove();
+	}
   if (document.getElementById("exportValue") == null) {
 
 		var obj = JSON.stringify(TabStats.Storage.stats);
@@ -121,6 +127,66 @@ function exportStats() {
 		document.getElementById("stat-controls").appendChild(expStr);
 		document.getElementById("exportValue").select();
 	}
+}
+
+function displayImportStatsField() {
+	exportfield = document.getElementById("exportValue");
+	if (exportfield != null) {
+	   exportfield.remove();
+	}
+  if (document.getElementById('importValue') == null) {
+		var input = document.createElement("input");
+		input.setAttribute("id", "importValue");
+		document.getElementById("stat-controls").appendChild(input);
+		document.getElementById("importValue").select();
+		var apply  = document.createElement("a");
+		apply.setAttribute("id", "applyImport");
+		apply.setAttribute("href", "#");
+		apply.innerHTML = "Apply";
+		document.getElementById("stat-controls").appendChild(apply);
+			document.getElementById("applyImport").addEventListener("click", importStats, false);
+	}
+}
+
+function importStats() {
+	if(document.getElementById("importValue") != null) {
+		try {
+			var obj = JSON.parse(document.getElementById("importValue").value);
+			if(validateImportedStats(obj) == false) {
+				throw 'Invaild Import Stats';
+			}
+			TabStats.Storage.stats = obj;
+			TabStats.updateRender();
+			document.getElementById('importValue').remove();
+			document.getElementById('applyImport').remove();
+		}
+		catch (e) {
+			//Todo report invalid JSON or Stats
+			throw e;
+		}
+	}
+}
+
+function validateImportedStats(jsonObj) {
+		 if(jsonObj.totals == null) {
+			 return false;
+		 }
+		 if(jsonObj.longest == null || jsonObj.longest.time == null
+			 || jsonObj.longest.title == null || jsonObj.longest.url == null) {
+			 return false;
+		 }
+		 if(jsonObj.current == null || jsonObj.current.count == null
+		 	 || jsonObj.current.date == null || jsonObj.current.active == null
+			 || jsonObj.current.duplicate == null || jsonObj.current.muted == null
+		   || jsonObj.current.pinned == null || jsonObj.current.incognito == null) {
+			 return false;
+		 }
+		 cActive = jsonObj.current.active;
+		 if(cActive.startTime == null || cActive.title == null
+			 || cActive.url == null) {
+				 return false;
+			 }
+			 return true;
 }
 
 function updateShowStatsCheckbox() {
