@@ -7,11 +7,11 @@ There are many ways for you to help, even if you are not able to help with the J
 - Add new features to the extension with the Javascript 
 - Improve the documentation here on GitHub
 - Test the extension and submit any bugs to the [Issues section](https://github.com/JohnAkerman/TabStats/issues)
-- Brainstorm new ideas and add them to the [Issues section](https://github.com/JohnAkerman/TabStats/issues) as *Enhancements*
+- Brainstorm new ideas and add them to the [Issues section](https://github.com/JohnAkerman/TabStats/labels/enhancement) as *Enhancements*
 
 ## Submitting changes
 
-Please send a [GitHub Pull Request](https://github.com/JohnAkerman/TabStats/pull/new/master) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). Each Pull Request should be on a feature branch with a prefix of feature-<featurename>. 
+Please send a [GitHub Pull Request](https://github.com/JohnAkerman/TabStats/pull/new/master) with a clear list of what you've done (read more about [pull requests](https://help.github.com/articles/about-pull-requests/)). Each Pull Request should be on a feature branch with a prefix of feature-<featurename>. 
 Always write a clear log message for your commits. One-line messages are fine for small changes but please use the description to include any further details if requred.
 
 ## Coding conventions
