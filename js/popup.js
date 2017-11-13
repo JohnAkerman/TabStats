@@ -8,11 +8,16 @@ function init() {
 	TabStats = chrome.extension.getBackgroundPage().window.TabStats;
 
 	// Run the duplicate count check with the callback to display stat
-	TabStats.duplicateCheck(updateDupCount);
+	// TabStats.duplicateCheck(updateDupCount);
 
 	setupEventListeners();
 
     renderPopupStats();
+    TabStats.checkDupes(false, function() {
+
+        console.log("callback");
+        updateDupCount();
+    });
 
 	updateShowStatsCheckbox();
 }
@@ -33,7 +38,7 @@ function updateDupCount() {
     var elem = document.getElementById('duplicateCount');
 	if (elem !== null) {
 		elem.innerHTML = TabStats.Storage.stats.current.duplicate;
-		if (TabStats.Storage.stats.current.duplicate) {
+		if (TabStats.Storage.stats.current.duplicate > 0) {
 			elem.classList.add("stat-list__value--highlight");
 		} else {
             elem.classList.remove("stat-list__value--highlight");
