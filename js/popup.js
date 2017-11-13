@@ -71,6 +71,16 @@ function renderPopupStats() {
     document.getElementById('pinnedCount').innerHTML = TabStats.Storage.stats.current.pinned || 0;
     document.getElementById('pinnedTotalCount').innerHTML = TabStats.Storage.stats.totals.pinned || 0;
 
+    if (TabStats.Storage.settings.allowedIncognito) {
+        document.getElementById('incognitoCount').innerHTML = TabStats.Storage.stats.current.incognito || 0;
+        document.getElementById('incognitoTotalCount').innerHTML = TabStats.Storage.stats.totals.incognito || 0;
+        document.getElementById('incognitoCount').parentElement.classList.remove("hide");
+        document.getElementById('incognitoTotalCount').parentElement.classList.remove("hide");
+    } else {
+        document.getElementById('incognitoCount').parentElement.classList.add("hide");
+        document.getElementById('incognitoTotalCount').parentElement.classList.add("hide");
+    }
+
     setRadioValue("showStatType", TabStats.Storage.settings.showValue);
 
     // Get current window tab count
