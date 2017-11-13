@@ -15,7 +15,8 @@ var tabStatsStorage = {
             deleted: 0,
             duplicated: 0,
             muted: 0,
-            pinned: 0
+            pinned: 0,
+            incognito: 0
         },
         longest: {
             time: 0,
@@ -34,7 +35,8 @@ var tabStatsStorage = {
             },
             duplicate: 0,
             muted: 0,
-            pinned: 0
+            pinned: 0,
+            incognito: 0
         }
     }
 };
@@ -59,9 +61,16 @@ TabStats.clearLongestTab = function() {
 
 var mutedTabs = [];
 var pinnedTabs = [];
+var incognitoTabs = [];
+var tabArray = [];
+var tabDupArray = [];
 
 TabStats.init = function() {
 	TabStats.checkFirstRun();
+
+    chrome.extension.isAllowedIncognitoAccess(function(isAllowed) {
+        TabStats.Storage.settings.allowedIncognito = isAllowed;
+    });
 
     // Tab Event Listeners
 	chrome.tabs.onCreated.addListener(TabStats.onNewTab);
@@ -74,6 +83,7 @@ TabStats.init = function() {
         TabStats.Storage.stats.current.count = 0;
         TabStats.Storage.stats.current.muted = 0;
         TabStats.Storage.stats.current.pinned = 0;
+        TabStats.Storage.stats.current.incognito = 0;
 
         for(var i = 0; i < windows.length; i++) {
             TabStats.Storage.stats.current.count += windows[i].tabs.length;
@@ -83,15 +93,26 @@ TabStats.init = function() {
                 // Check to see if any tabs are muted
                 if (windows[i].tabs[j].mutedInfo.muted) {
                     TabStats.Storage.stats.current.muted++;
-                    mutedTabs.push(windows[i].tabs[j].tabId);
+                    mutedTabs.push(windows[i].tabs[j].id);
                 }
 
                 if (windows[i].tabs[j].pinned) {
                     TabStats.Storage.stats.current.pinned++;
-                    pinnedTabs.push(windows[i].tabs[j].tabId);
+                    pinnedTabs.push(windows[i].tabs[j].id);
+                }
+
+                if (TabStats.Storage.settings.allowedIncognito && windows[i].tabs[j].incognito) {
+                    TabStats.Storage.stats.current.incognito++;
+                    incognitoTabs.push(windows[i].tabs[j].id);
+                }
+
+                if (tabDupArray.indexOf(windows[i].tabs[j].id) === -1) {
+                    tabArray.push({title: windows[i].tabs[j].title, id: windows[i].tabs[j].id});
+                    tabDupArray.push(windows[i].tabs[j].id);
                 }
             }
         }
+        TabStats.checkDupes(false);
         TabStats.updateRender();
     });
 };
@@ -129,7 +150,7 @@ TabStats.onUpdatedTab = function(tabId, changedInfo, tab) {
         }
     }
 
-    if (changedInfo.pinned) {
+    if (tab.pinned) {
         TabStats.Storage.stats.totals.pinned++;
         TabStats.Storage.stats.current.pinned++;
         pinnedTabs.push(tabId);
@@ -148,24 +169,58 @@ TabStats.onUpdatedTab = function(tabId, changedInfo, tab) {
     TabStats.updateRender();
 };
 
-TabStats.onNewTab = function() {
+TabStats.onNewTab = function(tab) {
     TabStats.Storage.stats.current.count++;
     TabStats.Storage.stats.totals.created++;
 
+    if (TabStats.Storage.settings.allowedIncognito && tab.incognito) {
+        TabStats.Storage.stats.totals.incognito++;
+        TabStats.Storage.stats.current.incognito++;
+        incognitoTabs.push(tab.id);
+    }
+
+    if (tabDupArray.indexOf(tab.id) === -1) {
+        tabArray.push({title: tab.title, id: tab.id});
+        tabDupArray.push(tab.id);
+    }
+
 	// TabStats.dayChangeResetter();
+
+    TabStats.checkDupes(true);
 
     TabStats.updateRender();
 	TabStats.saveStats();
 };
 
-TabStats.onCloseTab = function() {
+TabStats.onCloseTab = function(tab) {
    TabStats.Storage.stats.current.count--;
    TabStats.Storage.stats.totals.deleted++;
 
-   // TabStats.dayChangeResetter();
+   var index = pinnedTabs.indexOf(tab);
+   if (index > -1) {
+       TabStats.Storage.stats.current.pinned--;
+       pinnedTabs.splice(index, 1);
+   }
 
-   TabStats.updateRender();
+   index = incognitoTabs.indexOf(tab);
+   if (index > -1) {
+       TabStats.Storage.stats.current.incognito--;
+       incognitoTabs.splice(index, 1);
+   }
+
+   index = tabDupArray.indexOf(tab);
+   if (index > -1) {
+       TabStats.Storage.stats.current.duplicate--;
+       tabArray.splice(index, 1);
+       tabDupArray.splice(index, 1);
+   }
+
+   // TabStats.dayChangeResetter();
+   TabStats.Storage.stats.current.pinned = pinnedTabs.length;
+   TabStats.Storage.stats.current.incognito = incognitoTabs.length;
+
    TabStats.saveStats();
+   TabStats.updateRender();
 };
 
 TabStats.setLongestTabFromActive = function(totalTime) {
@@ -300,32 +355,29 @@ function numberOutput(val) {
     return (val > 1000 ? (val /1000).toFixed(1) + 'k' : val);
 }
 
-TabStats.duplicateCheck = function(callback) {
-    var tabArray = Array();
-    chrome.windows.getAll({populate: true}, function (windows) {
-        for(var i = 0; i < windows.length; i++) {
-            for(var j = 0; j < windows[i].tabs.length; j++) {
-                tabArray.push(windows[i].tabs[j].title);
-            }
-        }
-        checkDupes(tabArray);
-        callback();
-    });
-};
-
 // Count up the dupes
-function checkDupes(tabArray) {
+TabStats.checkDupes = function(addToTotal, cb) {
     counter = {};
     dupes = 0;
-    tabArray.forEach(function(obj) {
-        var key = JSON.stringify(obj);
-        counter[key] = (counter[key] || 0) + 1;
-        dupes += (counter[key] - 1);
+    TabStats.Storage.stats.current.duplicate = 0;
+
+    var counts = {};
+    tabArray.forEach(function(x) { counts[x.title] = (counts[x.title] || 0) + 1; });
+
+    Object.keys(counts).forEach(function(key) {
+        if (counts[key] > 1) dupes += counts[key];
     });
-    TabStats.Storage.stats.totals.duplicated += dupes;
-    TabStats.Storage.stats.current.duplicate = dupes;
+
+    TabStats.Storage.stats.current.duplicate = (dupes > 0 ? dupes -= 1 : 0);
+
+    if (addToTotal) {
+        TabStats.Storage.stats.totals.duplicated++;
+    }
+    TabStats.updateRender();
     TabStats.saveStats();
-}
+
+    if (cb) cb();
+};
 
 // Call init on load
 window.addEventListener("load", TabStats.init, false);

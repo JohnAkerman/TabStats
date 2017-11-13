@@ -22,6 +22,10 @@ h1 {
 	padding-top: 50px;
 }
 
+.hide {
+	display: none;
+}
+
 #reset{
 	cursor: pointer;
 	color: #e74c00;
@@ -78,7 +82,7 @@ h1 {
 .created { color: #4E9C4E; }
 .deleted { color: #CF1E1E; }
 .current { color: #5885E4; }
-.duplicate { color: #ff9800; }
+.duplicate.stat-list__value--highlight { color: #ff9800; }
 
 .stat-val {
 	font-weight: bold;

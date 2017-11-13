@@ -8,11 +8,16 @@ function init() {
 	TabStats = chrome.extension.getBackgroundPage().window.TabStats;
 
 	// Run the duplicate count check with the callback to display stat
-	TabStats.duplicateCheck(updateDupCount);
+	// TabStats.duplicateCheck(updateDupCount);
 
 	setupEventListeners();
 
     renderPopupStats();
+    TabStats.checkDupes(false, function() {
+
+        console.log("callback");
+        updateDupCount();
+    });
 
 	updateShowStatsCheckbox();
 }
@@ -33,7 +38,7 @@ function updateDupCount() {
     var elem = document.getElementById('duplicateCount');
 	if (elem !== null) {
 		elem.innerHTML = TabStats.Storage.stats.current.duplicate;
-		if (TabStats.Storage.stats.current.duplicate) {
+		if (TabStats.Storage.stats.current.duplicate > 0) {
 			elem.classList.add("stat-list__value--highlight");
 		} else {
             elem.classList.remove("stat-list__value--highlight");
@@ -70,6 +75,16 @@ function renderPopupStats() {
     document.getElementById('mutedTotalCount').innerHTML = TabStats.Storage.stats.totals.muted || 0;
     document.getElementById('pinnedCount').innerHTML = TabStats.Storage.stats.current.pinned || 0;
     document.getElementById('pinnedTotalCount').innerHTML = TabStats.Storage.stats.totals.pinned || 0;
+
+    if (TabStats.Storage.settings.allowedIncognito) {
+        document.getElementById('incognitoCount').innerHTML = TabStats.Storage.stats.current.incognito || 0;
+        document.getElementById('incognitoTotalCount').innerHTML = TabStats.Storage.stats.totals.incognito || 0;
+        document.getElementById('incognitoCount').parentElement.classList.remove("hide");
+        document.getElementById('incognitoTotalCount').parentElement.classList.remove("hide");
+    } else {
+        document.getElementById('incognitoCount').parentElement.classList.add("hide");
+        document.getElementById('incognitoTotalCount').parentElement.classList.add("hide");
+    }
 
     setRadioValue("showStatType", TabStats.Storage.settings.showValue);
 
