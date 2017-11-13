@@ -4,7 +4,7 @@
 
 [![GitHub license](https://img.shields.io/github/license/JohnAkerman/TabStats.svg)](https://github.com/JohnAkerman/TabStats/blob/master/LICENSE)&nbsp;&nbsp;
 [![GitHub issues](https://img.shields.io/github/issues/JohnAkerman/TabStats.svg)](https://github.com/JohnAkerman/TabStats/issues)
-[![GitHub closed issues](https://img.shields.io/github/issues-closed/JohnAkerman/TabStats.svg)]()
+[![GitHub closed issues](https://img.shields.io/github/issues-closed/JohnAkerman/TabStats.svg)](https://github.com/JohnAkerman/TabStats/issues?q=is%3Aissue+is%3Aclosed)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/JohnAkerman/TabStats/issues)
 
 ## What is TabStats?
