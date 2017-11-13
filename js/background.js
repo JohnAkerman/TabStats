@@ -14,7 +14,8 @@ var tabStatsStorage = {
             created: 0,
             deleted: 0,
             duplicated: 0,
-            muted: 0
+            muted: 0,
+            pinned: 0
         },
         longest: {
             time: 0,
@@ -32,7 +33,8 @@ var tabStatsStorage = {
                 startTime: 0,
             },
             duplicate: 0,
-            muted: 0
+            muted: 0,
+            pinned: 0
         }
     }
 };
@@ -56,6 +58,7 @@ TabStats.clearLongestTab = function() {
 };
 
 var mutedTabs = [];
+var pinnedTabs = [];
 
 TabStats.init = function() {
 	TabStats.checkFirstRun();
@@ -70,16 +73,22 @@ TabStats.init = function() {
     chrome.windows.getAll({populate: true}, function (windows) {
         TabStats.Storage.stats.current.count = 0;
         TabStats.Storage.stats.current.muted = 0;
+        TabStats.Storage.stats.current.pinned = 0;
 
         for(var i = 0; i < windows.length; i++) {
             TabStats.Storage.stats.current.count += windows[i].tabs.length;
 
             for(var j = 0; j < windows[i].tabs.length; j++) {
-
+                // console.log(windows[i].tabs[j]);
                 // Check to see if any tabs are muted
                 if (windows[i].tabs[j].mutedInfo.muted) {
                     TabStats.Storage.stats.current.muted++;
                     mutedTabs.push(windows[i].tabs[j].tabId);
+                }
+
+                if (windows[i].tabs[j].pinned) {
+                    TabStats.Storage.stats.current.pinned++;
+                    pinnedTabs.push(windows[i].tabs[j].tabId);
                 }
             }
         }
@@ -120,13 +129,23 @@ TabStats.onUpdatedTab = function(tabId, changedInfo, tab) {
         }
     }
 
-    TabStats.updatedMutedCount();
+    if (changedInfo.pinned) {
+        TabStats.Storage.stats.totals.pinned++;
+        TabStats.Storage.stats.current.pinned++;
+        pinnedTabs.push(tabId);
+    }
+    else {
+        var index = pinnedTabs.indexOf(tabId);
+        if (index > -1) {
+            pinnedTabs.splice(index, 1);
+        }
+    }
+
+    TabStats.Storage.stats.current.muted = mutedTabs.length;
+    TabStats.Storage.stats.current.pinned = pinnedTabs.length;
+
     TabStats.saveStats();
     TabStats.updateRender();
-};
-
-TabStats.updatedMutedCount = function() {
-    TabStats.Storage.stats.current.muted = mutedTabs.length;
 };
 
 TabStats.onNewTab = function() {

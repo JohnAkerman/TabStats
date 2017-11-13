@@ -60,14 +60,16 @@ function longestReset() {
 }
 
 function renderPopupStats() {
-	document.getElementById('currentCount').innerHTML = TabStats.Storage.stats.current.count;
-	document.getElementById('totalCreated').innerHTML = TabStats.Storage.stats.totals.created;
-	document.getElementById('totalDeleted').innerHTML = TabStats.Storage.stats.totals.deleted;
-	document.getElementById('longestTimeOnTab').innerHTML = timeSince(TabStats.Storage.stats.longest.time / 1000);
+	document.getElementById('currentCount').innerHTML = TabStats.Storage.stats.current.count || 0;
+    document.getElementById('totalCreated').innerHTML = TabStats.Storage.stats.totals.created || 0;
+	document.getElementById('totalDeleted').innerHTML = TabStats.Storage.stats.totals.deleted || 0;
+	document.getElementById('longestTimeOnTab').innerHTML = timeSince(TabStats.Storage.stats.longest.time / 1000) || 0;
 	document.getElementById('longestTabName').setAttribute("title", TabStats.Storage.stats.longest.title);
-    document.getElementById('duplicateTotalCount').innerHTML = TabStats.Storage.stats.totals.duplicate;
-    document.getElementById('mutedCount').innerHTML = TabStats.Storage.stats.current.muted;
-    document.getElementById('mutedTotalCount').innerHTML = TabStats.Storage.stats.totals.muted;
+    document.getElementById('duplicateTotalCount').innerHTML = TabStats.Storage.stats.totals.duplicate || 0;
+    document.getElementById('mutedCount').innerHTML = TabStats.Storage.stats.current.muted || 0;
+    document.getElementById('mutedTotalCount').innerHTML = TabStats.Storage.stats.totals.muted || 0;
+    document.getElementById('pinnedCount').innerHTML = TabStats.Storage.stats.current.pinned || 0;
+    document.getElementById('pinnedTotalCount').innerHTML = TabStats.Storage.stats.totals.pinned || 0;
 
     setRadioValue("showStatType", TabStats.Storage.settings.showValue);
 
