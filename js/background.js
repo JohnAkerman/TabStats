@@ -37,9 +37,58 @@ var tabStatsStorage = {
             muted: 0,
             pinned: 0,
             incognito: 0
+        },
+        tabs: {
+            urls : []
         }
     }
 };
+
+TabStats.saveTabDetails = function(tab) {
+    // Parse Domain name
+    var removedProtocol = tab.url.replace(/https?:\/\//g, '');
+    var urlSplit = removedProtocol.split(/[/?#]/);
+    var domainUrl = urlSplit[0];
+
+    if (TabStats.Storage.stats.hasOwnProperty("tabs") === false || TabStats.Storage.stats.tabs === false) {
+        TabStats.Storage.stats.tabs = {};
+    }
+
+    // if (TabStats.Storage.stats.tabs.hasOwnProperty("urls") === false || TabStats.Storage.stats.tabs.urls === null) {
+    //     TabStats.Storage.stats.tabs.urls = [];
+    // }
+
+    // Check if tab already existes
+    if (TabStats.Storage.stats.tabs.urls.hasOwnProperty(domainUrl)) {
+        var currentCount = TabStats.Storage.stats.tabs.urls[domainUrl].count + 1;
+
+        TabStats.Storage.stats.tabs.urls[domainUrl].id = tab.id;
+        TabStats.Storage.stats.tabs.urls[domainUrl].updated = new Date();
+        TabStats.Storage.stats.tabs.urls[domainUrl].count = currentCount;
+    } else {
+        TabStats.Storage.stats.tabs.urls[domainUrl] = {
+            id: tab.id,
+            url: domainUrl,
+            created: new Date(),
+            count: 1
+        };
+    }
+
+    TabStats.saveStats();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Clear stats
@@ -165,6 +214,10 @@ TabStats.onUpdatedTab = function(tabId, changedInfo, tab) {
     TabStats.Storage.stats.current.muted = mutedTabs.length;
     TabStats.Storage.stats.current.pinned = pinnedTabs.length;
 
+    if  (typeof changedInfo.status !== "undefined" && changedInfo.status === "complete") {
+        TabStats.saveTabDetails(tab);
+    }
+
     TabStats.saveStats();
     TabStats.updateRender();
 };
@@ -183,6 +236,8 @@ TabStats.onNewTab = function(tab) {
         tabArray.push({title: tab.title, id: tab.id});
         tabDupArray.push(tab.id);
     }
+
+    TabStats.saveTabDetails(tab);
 
 	// TabStats.dayChangeResetter();
 
