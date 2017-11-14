@@ -67,14 +67,36 @@ TabStats.saveTabDetails = function(tab) {
             id: tab.id,
             url: domainUrl,
             created: new Date(),
-            count: 1
+            count: 1,
+            hits: []
         };
     }
+
+    if (typeof TabStats.Storage.stats.tabs.urls[domainUrl].hits === "undefined") {
+        TabStats.Storage.stats.tabs.urls[domainUrl].hits = [];
+    }
+
+    TabStats.Storage.stats.tabs.urls[domainUrl].hits.push(new Date());
 
     TabStats.saveStats();
 };
 
+TabStats.topTabDetails = function() {
+    var highestCount = -1;
+    var lowestCount = 9999999;
+    var highest, lowest;
 
+    for (var site in TabStats.Storage.stats.tabs.urls) {
+        if (!TabStats.Storage.stats.tabs.urls.hasOwnProperty(site)) continue;
+
+        var obj = TabStats.Storage.stats.tabs.urls[site];
+
+        if (obj.hits.length > highestCount) { highest = obj; highestCount = obj.hits.length; }
+        if (obj.hits.length < lowestCount) { lowest = obj; lowestCount = obj.hits.length; }
+    }
+
+    return { highest: highest, lowest: lowest, highestCount: highestCount, lowestCount: lowestCount  };
+};
 
 
 
