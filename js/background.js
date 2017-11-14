@@ -54,9 +54,9 @@ TabStats.saveTabDetails = function(tab) {
         TabStats.Storage.stats.tabs = {};
     }
 
-    // if (TabStats.Storage.stats.tabs.hasOwnProperty("urls") === false || TabStats.Storage.stats.tabs.urls === null) {
-    //     TabStats.Storage.stats.tabs.urls = [];
-    // }
+    if (TabStats.Storage.stats.tabs.hasOwnProperty("urls") === false || TabStats.Storage.stats.tabs.urls === null) {
+        TabStats.Storage.stats.tabs.urls = [];
+    }
 
     // Check if tab already existes
     if (TabStats.Storage.stats.tabs.urls.hasOwnProperty(domainUrl)) {
