@@ -37,9 +37,6 @@ var tabStatsStorage = {
             muted: 0,
             pinned: 0,
             incognito: 0
-        },
-        tabs: {
-            urls : []
         }
     }
 };
@@ -54,8 +51,8 @@ TabStats.saveTabDetails = function(tab) {
         TabStats.Storage.stats.tabs = {};
     }
 
-    if (TabStats.Storage.stats.tabs.hasOwnProperty("urls") === false || TabStats.Storage.stats.tabs.urls === null) {
-        TabStats.Storage.stats.tabs.urls = [];
+    if (typeof TabStats.Storage.stats.tabs.urls === "undefined") {
+        TabStats.Storage.stats.tabs.urls = {};
     }
 
     // Check if tab already existes
