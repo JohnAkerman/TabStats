@@ -142,7 +142,7 @@ TabStats.topHitsPerHour = function() {
     return { url: topTab.url, hours : hitsPerHour };
 };
 
-TabStats.hitsPerHour = function() {
+TabStats.hitsPer = function(dateType) {
     var combinedHits = [];
 
     for (var site in TabStats.Storage.stats.tabs.urls) {
@@ -155,9 +155,9 @@ TabStats.hitsPerHour = function() {
         }
     }
 
-    var hitsPerHour =  TabStats.splitHitsByRange(combinedHits, "hour");
+    var hitsPerHour =  TabStats.splitHitsByRange(combinedHits, dateType);
 
-    return { hours : hitsPerHour };
+    return { dateType : hitsPerHour };
 };
 
 // Clear stats
