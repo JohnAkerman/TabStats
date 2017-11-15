@@ -142,6 +142,23 @@ TabStats.topHitsPerHour = function() {
     return { url: topTab.url, hours : hitsPerHour };
 };
 
+TabStats.hitsPerHour = function() {
+    var combinedHits = [];
+
+    for (var site in TabStats.Storage.stats.tabs.urls) {
+        if (!TabStats.Storage.stats.tabs.urls.hasOwnProperty(site)) continue;
+
+        var obj = TabStats.Storage.stats.tabs.urls[site];
+
+        for (var i = 0; i < obj.hits.length; i++) {
+            combinedHits.push(obj.hits[i]);
+        }
+    }
+
+    var hitsPerHour =  TabStats.splitHitsByRange(combinedHits, "hour");
+
+    return { hours : hitsPerHour };
+};
 
 // Clear stats
 TabStats.resetStats = function() {
