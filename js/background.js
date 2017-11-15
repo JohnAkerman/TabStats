@@ -47,6 +47,9 @@ TabStats.saveTabDetails = function(tab) {
     var urlSplit = removedProtocol.split(/[/?#]/);
     var domainUrl = urlSplit[0];
 
+    // Check for internal pages and skip them
+    if (domainUrl === "chrome:" || domainUrl === "") return false;
+
     if (TabStats.Storage.stats.hasOwnProperty("tabs") === false || TabStats.Storage.stats.tabs === false) {
         TabStats.Storage.stats.tabs = {};
     }
@@ -83,7 +86,7 @@ TabStats.saveTabDetails = function(tab) {
 
 TabStats.topTabDetails = function() {
     var highestCount = -1;
-    var lowestCount = 9999999;
+    var lowestCount = 9999999999;
     var highest, lowest;
 
     for (var site in TabStats.Storage.stats.tabs.urls) {
@@ -95,19 +98,49 @@ TabStats.topTabDetails = function() {
         if (obj.hits.length < lowestCount) { lowest = obj; lowestCount = obj.hits.length; }
     }
 
-    return { highest: highest, lowest: lowest, highestCount: highestCount, lowestCount: lowestCount  };
+    return { highest: highest, lowest: lowest };
 };
 
 
+TabStats.splitHitsByRange = function(hits, dateType) {
+    // Usage: TabStats.splitHitsByRange(hits, "hour"); // Return an object with hours by associated object obj['21'] = count;
+    // Based on format
+    // '2017-01-01T00:00:00Z'
+    var dateSegments = {
+        year: 0,
+        month: 1,
+        day: 2,
+        hour: 3,
+        min: 4,
+        sec: 5
+    };
 
+    var dateIndex = dateSegments[dateType];
+    var dateArr = {};
 
+    // Loop through each hit item
+    for (var i = 0; i < hits.length; i++) {
+        var dateSplit = hits[i].split(/\D/);
+        var count = dateArr[dateSplit[dateIndex]];
 
+        if (count > 0) {
+            count++;
+        } else {
+            count = 1;
+        }
 
+        dateArr[dateSplit[dateIndex]] = count;
+    }
 
+    return dateArr;
+};
 
+TabStats.topHitsPerHour = function() {
+    var topTab = TabStats.topTabDetails().highest;
+    var hitsPerHour =  TabStats.splitHitsByRange(topTab.hits, "hour");
 
-
-
+    return { url: topTab.url, hours : hitsPerHour };
+};
 
 
 // Clear stats
