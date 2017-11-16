@@ -105,7 +105,7 @@ TabStats.topTabDetails = function() {
 TabStats.splitHitsByRange = function(hits, dateType) {
     // Usage: TabStats.splitHitsByRange(hits, "hour"); // Return an object with hours by associated object obj['21'] = count;
     // Based on format
-    // '2017-01-01T00:00:00Z'
+    // 'YYYY-MM-DDTHH:mm:ssZ'
     var dateSegments = {
         year: 0,
         month: 1,
@@ -116,11 +116,25 @@ TabStats.splitHitsByRange = function(hits, dateType) {
     };
 
     var dateIndex = dateSegments[dateType];
+
+    if (typeof dateIndex === "undefined") throw "dateType is not recognised";
     var dateArr = {};
 
     // Loop through each hit item
     for (var i = 0; i < hits.length; i++) {
-        var dateSplit = hits[i].split(/\D/);
+        var dateSplit;
+
+        try {
+            dateSplit = hits[i].split(/\D/);
+        } catch(e) {
+
+            if (e instanceof TypeError) {
+                dateSplit = hits[i].toISOString().split(/\D/);
+            } else {
+                console.error(e);
+            }
+        }
+
         var count = dateArr[dateSplit[dateIndex]];
 
         if (count > 0) {
