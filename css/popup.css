@@ -166,6 +166,6 @@ a {
     font-weight: bold;
 }
 
-#dragarea.drag-hover.wrapper {
+#dragarea.drag-hover .wrapper {
 	opacity: .2;
 }

@@ -35,6 +35,7 @@ function setupEventListeners() {
 
 	document.getElementById("dragarea").addEventListener("dragover", dragOver, true);
 	document.getElementById("dragarea").addEventListener("dragend", dragEnd, true);
+	document.getElementById("dragarea").addEventListener("dragleave", dragEnd, true);
 	document.getElementById("dragarea").addEventListener("drop", dragDrop, true);
 }
 
@@ -215,6 +216,7 @@ function dragOver(e) {
 }
 
 function dragEnd(e) {
+	e.preventDefault();
 	this.classList.remove('drag-hover');
 }
 
