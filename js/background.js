@@ -53,6 +53,12 @@ TabStats.clearTotalDeleted = function() {
     TabStats.updateRender();
 };
 
+TabStats.clearTotalCreated = function() {
+    TabStats.Storage.stats.totals.created = 0;
+    TabStats.saveStats();
+    TabStats.updateRender();
+};
+
 TabStats.clearLongestTab = function() {
     TabStats.Storage.stats.longest = tabStatsStorage.stats.longest;
     TabStats.saveStats();

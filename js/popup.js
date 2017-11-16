@@ -29,7 +29,10 @@ function setupEventListeners() {
     document.getElementById("showDeleted").addEventListener("click", showDeleted, false);
 	document.getElementById("showMuted").addEventListener("click", showMuted, false);
 	document.getElementById("exportStats").addEventListener("click", exportStats, false);
+
+	// Clear stats
 	document.getElementById("deletedReset").addEventListener("click", deletedReset, false);
+	document.getElementById("createdReset").addEventListener("click", createdReset, false);
 	document.getElementById("longestReset").addEventListener("click", longestReset, false);
 	document.getElementById("clearAllStats").addEventListener("click", clearAllStats, false);
 }
@@ -53,15 +56,24 @@ function updateDupCount() {
 
 function clearAllStats() {
     TabStats.resetStats();
-    TabStats.updateRender();
+    renderPopupStats();
 }
 
 function deletedReset() {
 	TabStats.clearTotalDeleted();
+	document.getElementById('totalDeleted').innerHTML = TabStats.Storage.stats.totals.deleted || 0;
+	renderPopupStats();
+}
+
+function createdReset() {
+	TabStats.clearTotalCreated();
+	document.getElementById('totalCreated').innerHTML = TabStats.Storage.stats.totals.created || 0;
+	renderPopupStats();
 }
 
 function longestReset() {
     TabStats.clearLongestTab();
+	renderPopupStats();
 }
 
 function renderPopupStats() {
