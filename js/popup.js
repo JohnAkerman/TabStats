@@ -229,7 +229,7 @@ function dragDrop(e) {
 		var text = e.target.result;
 		if (isValidJSON(text)) {
 			TabStats.Storage.stats = JSON.parse(text);
-			TabStats.updateRender();
+			renderPopupStats();
 		} else {
 			console.error("Invalid file format, please ensure its JSON");
 		}
