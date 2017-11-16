@@ -31,6 +31,11 @@ function setupEventListeners() {
 	document.getElementById("deletedReset").addEventListener("click", deletedReset, false);
 	document.getElementById("longestReset").addEventListener("click", longestReset, false);
 	document.getElementById("clearAllStats").addEventListener("click", clearAllStats, false);
+
+
+	document.getElementById("dragarea").addEventListener("dragover", dragOver, true);
+	document.getElementById("dragarea").addEventListener("dragend", dragEnd, true);
+	document.getElementById("dragarea").addEventListener("drop", dragDrop, true);
 }
 
 function updateDupCount() {
@@ -198,6 +203,45 @@ function validateImportedStats(jsonObj) {
 				 return false;
 			 }
 			 return true;
+}
+
+function dragStart(e) {
+ 	e.dataTransfer.setData('text/plain', null); //cannot be empty string
+}
+
+function dragOver(e) {
+	e.preventDefault();
+	this.classList.add('drag-hover');
+}
+
+function dragEnd(e) {
+	this.classList.remove('drag-hover');
+}
+
+function dragDrop(e) {
+	e.preventDefault();
+	this.classList.remove('drag-hover');
+	var file = e.dataTransfer.files[0];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+		var text = e.target.result;
+		if (isValidJSON(text)) {
+			TabStats.Storage.stats = JSON.parse(text);
+			TabStats.updateRender();
+		} else {
+			console.error("Invalid file format, please ensure its JSON");
+		}
+    };
+    reader.readAsText(file);
+}
+
+function isValidJSON(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
 }
 
 function updateShowStatsCheckbox() {
