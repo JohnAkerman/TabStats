@@ -116,7 +116,7 @@ h1 {
 	font-size: 12px;
 }
 
-#exportValue {
+#exportValue #importValue {
 	background: rgba(223,223,223,0.28);
 	border: 1px solid #D5D5D5;
 	padding: 4px 0;
@@ -125,13 +125,17 @@ h1 {
 	border-radius: 3px;
 	margin: 3px 0;
 }
-
+/*
 #clearAllStats {
+	float: right;
+}*/
+
+#applyImport {
 	float: right;
 }
 
 .author {
-	margin: 5px 0 -15px 0;
+	margin: 5px 0 -16px 0;
 	font-size: 11px;
 }
 	.author a { font-weight: bold; }
@@ -144,3 +148,24 @@ a {
 	a:hover {
 		text-decoration: underline;
 	}
+
+
+#dragarea.drag-hover:before {
+	content: "Drop File";
+    position: absolute;
+    top: 20px;
+    bottom: 32px;
+    left: 20px;
+    right: 20px;
+    border: 3px dashed #cfcfcf;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 35px;
+    padding-top: 38vh;
+    color: #e74c00;
+    font-weight: bold;
+}
+
+#dragarea.drag-hover .wrapper {
+	opacity: .2;
+}

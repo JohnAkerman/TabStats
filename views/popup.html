@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="/css/popup.css" />
         <script src="/js/popup.js"></script>
     </head>
-    <body>
+    <body id="dragarea">
         <div class="wrapper">
             <h1>Tab Stats</h1>
             <ul class="stat-list">
@@ -17,7 +17,7 @@
                 <li class="stat-list__item"><span class="stat-list__value muted stat-val" id="incognitoCount">0</span> Incognito</li>
                 <li class="stat-list__item">&nbsp;</li>
                 <li class="stat-list__item"><h2>Total</h2></li>
-                <li class="stat-list__item"><span class="stat-list__value created stat-val" id="totalCreated">0</span> Created&nbsp;<a class="resetBtn" href="#" id="deletedReset">X</a></li>
+                <li class="stat-list__item"><span class="stat-list__value created stat-val" id="totalCreated">0</span> Created&nbsp;<a class="resetBtn" href="#" id="createdReset">X</a></li>
                 <li class="stat-list__item"><span class="stat-list__value deleted stat-val" id="totalDeleted">0</span> Deleted&nbsp;<a class="resetBtn" href="#" id="deletedReset">X</a></li>
                 <li class="stat-list__item"><span class="stat-list__value duplicate stat-val" id="duplicateTotalCount">0</span> Duplicate</li>
                 <li class="stat-list__item"><span class="stat-list__value muted stat-val" id="mutedTotalCount">0</span> Muted</li>
@@ -35,8 +35,7 @@
             </div>
 
             <div id="stat-controls" class="stat-controls">
-                <a id="exportStats" href="#">Export Stats</a>
-                <a id="clearAllStats" href="#">Clear all stats</a>
+                <a id="exportStats" href="#">Export</a>, <a id="importStats" href="#">Import</a> or <a id="clearAllStats" href="#">Reset</a> Stats
             </div>
             <p class="author">Created by <a href="http://www.johnakerman.co.uk" target="_blank">John</a> and <a href="http://mabportfolio.com/">Matthew</a></p>
         </div>
