@@ -309,3 +309,12 @@ function timeSince(seconds) {
 
 	return Math.floor(seconds) + "s";
 }
+
+
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.msg === "updateRender") {
+			renderPopupStats();
+        }
+    }
+);
