@@ -28,6 +28,10 @@ function init() {
     updateRender();
 }
 
+function byteCount(s) {
+    return encodeURI(s).split(/%..|./).length - 1;
+}
+
 function updateRender() {
     updateExportDate();
 
@@ -41,12 +45,14 @@ function updateRender() {
         document.getElementById("perDomain").checked = true;
         TabStats.Storage.settings.perDomain = true;
     }
+
+    document.getElementById('storageSize').innerHTML = byteCount(JSON.stringify(TabStats.Storage));
 }
 
 function updateExportDate() {
     if (typeof TabStats.Storage.settings.lastExport !== "undefined") {
         var d = new Date(TabStats.Storage.settings.lastExport);
-        document.getElementById('last-backup').innerHTML = d.toString();
+        document.getElementById('last-backup').innerHTML = d.toGMTString();
     } else {
         document.getElementById('last-backup').innerHTML = "Never";
     }

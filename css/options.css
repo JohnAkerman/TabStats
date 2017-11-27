@@ -1,9 +1,9 @@
 html {
 	font-family: "Segoe UI", Arial, sans-serif;
-	color: #888;
 	font-size: 17px;
 	line-height: 19px;
 	background: url(/img/lghtmesh.png);
+    color: #212121;
 }
 
 body {
@@ -50,12 +50,12 @@ label {
 
 p {
     margin-top: 0;
+    line-height: 1.4;
 }
 
 .advanced-options {
     margin-bottom: 15px;
 }
-
 
 .btn {
     padding: 0.6em 1em;
