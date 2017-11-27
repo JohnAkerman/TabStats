@@ -30,6 +30,17 @@ function init() {
 
 function updateRender() {
     updateExportDate();
+
+    // Per Domain
+    if (typeof TabStats.Storage.settings.perDomain !== "undefined" && TabStats.Storage.settings.perDomain) {
+        document.getElementById("perDomain").checked = true;
+        document.getElementById("perDomain").checked = "checked";
+    } else if (typeof TabStats.Storage.settings.perDomain !== "undefined" && TabStats.Storage.settings.perDomain === false) {
+        document.getElementById("perDomain").checked = false;
+    } else {
+        document.getElementById("perDomain").checked = true;
+        TabStats.Storage.settings.perDomain = true;
+    }
 }
 
 function updateExportDate() {
@@ -45,10 +56,22 @@ function setupEventListeners() {
     document.getElementById('backup').addEventListener('click', saveOptions);
     document.getElementById('restore').addEventListener('click', triggerFileInput);
     document.getElementById('restorePicker').addEventListener('change', handleFileInput);
+    document.getElementById('saveOptions').addEventListener('click', saveChanges);
+}
+
+function saveChanges() {
+    TabStats.Storage.settings.perDomain = document.getElementById("perDomain").checked;
+    TabStats.saveStats(); // TODO: Update this to save?
+
+    // Update status to let user know options were saved.
+    var status = document.getElementById('status');
+    status.textContent = 'Options saved.';
+    setTimeout(function() {
+        status.textContent = '';
+    }, 2000);
 }
 
 document.addEventListener('DOMContentLoaded', init);
-
 
 function triggerFileInput() {
     var fileInput = document.getElementById('restorePicker');
