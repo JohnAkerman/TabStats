@@ -29,7 +29,16 @@ function init() {
 }
 
 function updateRender() {
+    updateExportDate();
+}
 
+function updateExportDate() {
+    if (typeof TabStats.Storage.settings.lastExport !== "undefined") {
+        var d = new Date(TabStats.Storage.settings.lastExport);
+        document.getElementById('last-backup').innerHTML = d.toString();
+    } else {
+        document.getElementById('last-backup').innerHTML = "Never";
+    }
 }
 
 function setupEventListeners() {
@@ -53,11 +62,11 @@ function handleFileInput() {
     // Check to see if there is no file selected
     if (typeof file === "undefined" || file.name === "") return;
 
-    var result = TabStats.importFile(file);
-
-    if (result) {
-        console.log("Success");
-    } else {
-        console.log("Failure");
-    }
+    TabStats.importFile(file, function(result) {
+        if (result) {
+            console.log("Success");
+        } else {
+            console.log("Failure");
+        }
+    });
 }

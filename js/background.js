@@ -295,7 +295,7 @@ TabStats.saveStats = function() {
     localStorage.setItem("TabStats", JSON.stringify(TabStats.Storage));
 };
 
-TabStats.importFile = function(file) {
+TabStats.importFile = function(file, cb) {
 
     // Check to see if there is no file selected
     if (typeof file === "undefined" || file.name === "") return;
@@ -311,12 +311,13 @@ TabStats.importFile = function(file) {
 			   throw "Invalid file format, please ensure its JSON";
 		   }
 	   } catch (err) {
-		   return false;
+		   cb(false);
+           return;
 	   }
 
         TabStats.Storage = JSON.parse(text);
 
-		return true;
+        cb(true);
 	};
 
 	reader.readAsText(file);

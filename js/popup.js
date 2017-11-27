@@ -217,11 +217,11 @@ function dragDrop(e) {
 	this.classList.remove('drag-hover');
 	var file = e.dataTransfer.files[0];
 
-	var result = TabStats.importFile(file);
-
-	if (result) {
-		renderPopupStats();
-	}
+	TabStats.importFile(file, function(result) {
+        if (result) {
+			renderPopupStats();
+        }
+    });
 }
 
 function updateShowStatsCheckbox() {
