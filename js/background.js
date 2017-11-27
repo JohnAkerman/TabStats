@@ -142,6 +142,8 @@ TabStats.clearStats = function() {
 TabStats.onUpdatedTab = function(tabId, changedInfo, tab) {
     // console.log(tabId, changedInfo, tab);
     // If it muted the tab
+    var index;
+
     if (typeof changedInfo.mutedInfo !== "undefined") {
         if (changedInfo.mutedInfo.muted) {
             TabStats.Storage.stats.totals.muted++;
@@ -149,7 +151,7 @@ TabStats.onUpdatedTab = function(tabId, changedInfo, tab) {
             mutedTabs.push(tabId);
         }
         else {
-            var index = mutedTabs.indexOf(tabId);
+            index = mutedTabs.indexOf(tabId);
             if (index > -1) {
                 mutedTabs.splice(index, 1);
             }
@@ -162,7 +164,7 @@ TabStats.onUpdatedTab = function(tabId, changedInfo, tab) {
         pinnedTabs.push(tabId);
     }
     else {
-        var index = pinnedTabs.indexOf(tabId);
+        index = pinnedTabs.indexOf(tabId);
         if (index > -1) {
             pinnedTabs.splice(index, 1);
         }
@@ -173,6 +175,9 @@ TabStats.onUpdatedTab = function(tabId, changedInfo, tab) {
 
     TabStats.saveStats();
     TabStats.updateRender();
+
+    // Send message to popup
+    chrome.runtime.sendMessage({msg: "updateRender" });
 };
 
 TabStats.onNewTab = function(tab) {
@@ -196,6 +201,9 @@ TabStats.onNewTab = function(tab) {
 
     TabStats.updateRender();
 	TabStats.saveStats();
+
+    // Send message to popup
+    chrome.runtime.sendMessage({msg: "updateRender" });
 };
 
 TabStats.onCloseTab = function(tab) {
@@ -227,6 +235,9 @@ TabStats.onCloseTab = function(tab) {
 
    TabStats.saveStats();
    TabStats.updateRender();
+
+   // Send message to popup
+   chrome.runtime.sendMessage({msg: "updateRender" });
 };
 
 TabStats.setLongestTabFromActive = function(totalTime) {
@@ -264,6 +275,9 @@ TabStats.onActiveTabChange = function(activeInfo) {
     }
 
     TabStats.saveStats();
+
+    // Send message to popup
+    chrome.runtime.sendMessage({msg: "updateRender" });
 };
 
 TabStats.storeActiveTabData = function(activeInfo) {

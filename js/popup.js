@@ -311,6 +311,7 @@ function timeSince(seconds) {
 }
 
 
+// Handle messages received from the bg.js
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
         if (request.msg === "updateRender") {
