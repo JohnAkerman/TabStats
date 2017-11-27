@@ -14,8 +14,6 @@ function init() {
 
     renderPopupStats();
     TabStats.checkDupes(false, function() {
-
-        console.log("callback");
         updateDupCount();
     });
 
@@ -28,10 +26,17 @@ function setupEventListeners() {
 	document.getElementById("showCreated").addEventListener("click", showCreated, false);
     document.getElementById("showDeleted").addEventListener("click", showDeleted, false);
 	document.getElementById("showMuted").addEventListener("click", showMuted, false);
-	document.getElementById("exportStats").addEventListener("click", exportStats, false);
+	document.getElementById("exportStats").addEventListener("click", exportStatFile, false);
+	document.getElementById("importStats").addEventListener("click", displayImportStatsField, false);
 	document.getElementById("deletedReset").addEventListener("click", deletedReset, false);
 	document.getElementById("longestReset").addEventListener("click", longestReset, false);
 	document.getElementById("clearAllStats").addEventListener("click", clearAllStats, false);
+
+
+	document.getElementById("dragarea").addEventListener("dragover", dragOver, true);
+	document.getElementById("dragarea").addEventListener("dragend", dragEnd, true);
+	document.getElementById("dragarea").addEventListener("dragleave", dragEnd, true);
+	document.getElementById("dragarea").addEventListener("drop", dragDrop, true);
 }
 
 function updateDupCount() {
@@ -109,7 +114,25 @@ function toggleShowStats() {
 	TabStats.updateRender();
 }
 
+function exportStatFile() {
+	var fileBuffer = 'data:text/json;charset=utf-8,';
+	var fileObj = JSON.stringify(TabStats.Storage.stats);
+	var exportBtn = document.getElementById('exportStats');
+
+	fileBuffer += encodeURIComponent(fileObj);
+
+	// Setup the export button attributes
+	exportBtn.setAttribute('href', fileBuffer);
+	exportBtn.setAttribute('download', 'tabstats.json');
+}
+
 function exportStats() {
+
+	importfield = document.getElementById("importValue");
+	if (importfield != null) {
+		 importfield.remove();
+		 document.getElementById('applyImport').remove();
+	}
   if (document.getElementById("exportValue") == null) {
 
 		var obj = JSON.stringify(TabStats.Storage.stats);
@@ -121,6 +144,106 @@ function exportStats() {
 		document.getElementById("stat-controls").appendChild(expStr);
 		document.getElementById("exportValue").select();
 	}
+}
+
+function displayImportStatsField() {
+	exportfield = document.getElementById("exportValue");
+	if (exportfield != null) {
+	   exportfield.remove();
+	}
+  if (document.getElementById('importValue') == null) {
+		var input = document.createElement("input");
+		input.setAttribute("id", "importValue");
+		document.getElementById("stat-controls").appendChild(input);
+		document.getElementById("importValue").select();
+		var apply  = document.createElement("a");
+		apply.setAttribute("id", "applyImport");
+		apply.setAttribute("href", "#");
+		apply.innerHTML = "Apply";
+		document.getElementById("stat-controls").appendChild(apply);
+			document.getElementById("applyImport").addEventListener("click", importStats, false);
+	}
+}
+
+function importStats() {
+	if(document.getElementById("importValue") != null) {
+		try {
+			var obj = JSON.parse(document.getElementById("importValue").value);
+			if(validateImportedStats(obj) == false) {
+				throw 'Invaild Import Stats';
+			}
+			TabStats.Storage.stats = obj;
+			TabStats.updateRender();
+			document.getElementById('importValue').remove();
+			document.getElementById('applyImport').remove();
+		}
+		catch (e) {
+			//Todo report invalid JSON or Stats
+			throw e;
+		}
+	}
+}
+
+function validateImportedStats(jsonObj) {
+		 if(jsonObj.totals == null) {
+			 return false;
+		 }
+		 if(jsonObj.longest == null || jsonObj.longest.time == null
+			 || jsonObj.longest.title == null || jsonObj.longest.url == null) {
+			 return false;
+		 }
+		 if(jsonObj.current == null || jsonObj.current.count == null
+		 	 || jsonObj.current.date == null || jsonObj.current.active == null
+			 || jsonObj.current.duplicate == null || jsonObj.current.muted == null
+		   || jsonObj.current.pinned == null || jsonObj.current.incognito == null) {
+			 return false;
+		 }
+		 cActive = jsonObj.current.active;
+		 if(cActive.startTime == null || cActive.title == null
+			 || cActive.url == null) {
+				 return false;
+			 }
+			 return true;
+}
+
+function dragStart(e) {
+ 	e.dataTransfer.setData('text/plain', null); //cannot be empty string
+}
+
+function dragOver(e) {
+	e.preventDefault();
+	this.classList.add('drag-hover');
+}
+
+function dragEnd(e) {
+	e.preventDefault();
+	this.classList.remove('drag-hover');
+}
+
+function dragDrop(e) {
+	e.preventDefault();
+	this.classList.remove('drag-hover');
+	var file = e.dataTransfer.files[0];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+		var text = e.target.result;
+		if (isValidJSON(text)) {
+			TabStats.Storage.stats = JSON.parse(text);
+			renderPopupStats();
+		} else {
+			console.error("Invalid file format, please ensure its JSON");
+		}
+    };
+    reader.readAsText(file);
+}
+
+function isValidJSON(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
 }
 
 function updateShowStatsCheckbox() {
