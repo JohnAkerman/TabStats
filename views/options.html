@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tab Stats - Options</title>
+    <link rel="stylesheet" href="/css/options.css" />
+    <script src="/js/options.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <p>See the advanced options below that allow you to customise how Tab Stats works for you</p>
+
+        <div class="advanced-options">
+            <label><input type="checkbox" id="showStat" checked="checked"/> Per domain tracking</label>
+        </div>
+
+        <div class="storage">
+            Last backup: <span class="last-backup">Never</span>
+            <div class="storage__btns">
+                <a id="exportStats" class="hide" href="#">Export</a>
+                <button class="btn" id="backup">Backup to file</button>
+                <button class="btn" id="restore">Restore from file</button>
+                <input id="restorePicker" type="file" accept=".json" class="hide">
+            </div>
+        </div>
+
+        <div id="status"></div>
+        <button id="saveOptions" class="btn">Save changes</button>
+    </div>
+</body>
+
+</html>

@@ -126,7 +126,9 @@ function toggleShowStats() {
 
 function exportStatFile() {
 	var fileBuffer = 'data:text/json;charset=utf-8,';
-	var fileObj = JSON.stringify(TabStats.Storage.stats);
+	TabStats.Storage.settings.lastExport = new Date();
+
+	var fileObj = JSON.stringify(TabStats.Storage);
 	var exportBtn = document.getElementById('exportStats');
 
 	fileBuffer += encodeURIComponent(fileObj);
@@ -134,26 +136,6 @@ function exportStatFile() {
 	// Setup the export button attributes
 	exportBtn.setAttribute('href', fileBuffer);
 	exportBtn.setAttribute('download', 'tabstats.json');
-}
-
-function exportStats() {
-
-	importfield = document.getElementById("importValue");
-	if (importfield != null) {
-		 importfield.remove();
-		 document.getElementById('applyImport').remove();
-	}
-  if (document.getElementById("exportValue") == null) {
-
-		var obj = JSON.stringify(TabStats.Storage.stats);
-
-		var expStr = document.createElement("input");
-		expStr.setAttribute("value", obj);
-		expStr.setAttribute("id", "exportValue");
-
-		document.getElementById("stat-controls").appendChild(expStr);
-		document.getElementById("exportValue").select();
-	}
 }
 
 function displayImportStatsField() {
@@ -234,26 +216,12 @@ function dragDrop(e) {
 	e.preventDefault();
 	this.classList.remove('drag-hover');
 	var file = e.dataTransfer.files[0];
-    var reader = new FileReader();
-    reader.onload = function(e) {
-		var text = e.target.result;
-		if (isValidJSON(text)) {
-			TabStats.Storage.stats = JSON.parse(text);
-			renderPopupStats();
-		} else {
-			console.error("Invalid file format, please ensure its JSON");
-		}
-    };
-    reader.readAsText(file);
-}
 
-function isValidJSON(str) {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
+	var result = TabStats.importFile(file);
+
+	if (result) {
+		renderPopupStats();
+	}
 }
 
 function updateShowStatsCheckbox() {

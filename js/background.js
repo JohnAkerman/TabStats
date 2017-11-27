@@ -295,6 +295,33 @@ TabStats.saveStats = function() {
     localStorage.setItem("TabStats", JSON.stringify(TabStats.Storage));
 };
 
+TabStats.importFile = function(file) {
+
+    // Check to see if there is no file selected
+    if (typeof file === "undefined" || file.name === "") return;
+
+	var reader = new FileReader();
+	reader.onload = function(e) {
+	   var text = e.target.result;
+	   var data;
+	   try {
+		   data = JSON.parse(text);
+
+		   if (typeof data !== "object") {
+			   throw "Invalid file format, please ensure its JSON";
+		   }
+	   } catch (err) {
+		   return false;
+	   }
+
+        TabStats.Storage = JSON.parse(text);
+
+		return true;
+	};
+
+	reader.readAsText(file);
+};
+
 TabStats.updateRender = function() {
 
     if (TabStats.Storage.settings.showStats === false) {
